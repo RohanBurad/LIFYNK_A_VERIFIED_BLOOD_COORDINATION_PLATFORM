@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Lifynk</title>
+    <link  href="../assets/favicon.png" rel="icon">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/contact.css"> 
+    <script>
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="../assets/logo.png" alt="Lifynk">
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="work.html" >Our Working</a></li>
+            <li><a href="contact.html"class="active">Contact</a></li>
+            <li><a href="colab.html">Our Collaborators</a></li>
+        </ul>
+        <a href="../auth/login.html" class="btn-login">Login</a>
+    </nav>
+    <header class="contact-hero">
+        <div class="container reveal">
+            <div class="status-badge">
+                <span class="pulse-dot"></span> System Online: All Blood Banks Syncing
+            </div>
+            <h1 class="hero-title">Get in Touch</h1>
+            <p class="hero-description">Connecting donors, hospitals, and NGOs in real-time. For medical emergencies, use the priority hotline below.</p>
+        </div>
+    </header>
+
+    <section class="section-padding">
+        <div class="container contact-split">
+            
+            <div class="contact-info reveal">
+                <h2 class="section-title" style="text-align: left;">Contact Nodes</h2>
+                
+                <div class="info-item priority">
+                    <i class="fa-solid fa-truck-medical"></i>
+                    <div>
+                        <h4>Emergency Dispatch</h4>
+                        <p>+91 98765 43210 (Priority for Hospitals)</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fa-solid fa-handshake-angle"></i>
+                    <div>
+                        <h4>NGO Onboarding</h4>
+                        <p>partners@Lifynk.org</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <div>
+                        <h4>Headquarters</h4>
+                        <p>Silver Oak University, Gota, Ahmedabad</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-card reveal delay-1">
+                <form id="contactForm">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+
+                    <div class="form-row" style="display: flex; gap: 20px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>I am a...</label>
+                            <select class="form-control">
+                                <option value="donor">Individual Donor</option>
+                                <option value="hospital">Hospital Admin</option>
+                                <option value="ngo">NGO Representative</option>
+                                <option value="bloodbank">Blood Bank Officer</option>
+                                <option value="recipient">Individual Recipient</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>City</label>
+                            <input type="text" placeholder="Ahmedabad">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Message</label>
+                        <textarea rows="4" placeholder="How can we assist you today?"></textarea>
+                    </div>
+
+                    <div class="urgency-container">
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="urgency-label">Mark as Urgent Medical Requirement</span>
+                    </div>
+
+                    <button type="submit" class="btn-login" style="width: 100%; border:none; margin-top: 20px; cursor: pointer;">
+                        Send Priority Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="container reveal" style="margin-bottom: 100px;">
+        <div style="border-radius: 24px; overflow: hidden; height: 400px; box-shadow: var(--shadow);">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3670.5366301323864!2d72.5222384753037!3d23.077421979135064!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e833446180373%3A0xc395992925586940!2sSilver%20Oak%20University!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
+            </iframe>
+        </div>
+    </section>
+    <footer style="background: var(--primary-dark); color: white; padding: 60px 0 30px; overflow: hidden;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                <div class="reveal">
+                    <h3 style="color: var(--white); margin-bottom: 20px;">Lifynk</h3>
+                    <p style="font-size: 0.9rem; color: #94a3b8;">A Smart HealthCare initiative by Silver Oak University students.</p>
+                </div>
+                
+                <div class="reveal delay-1">
+                    <h4 style="margin-bottom: 20px;">Quick Links</h4>
+                    <ul style="list-style: none; font-size: 0.9rem; line-height: 2;">
+                        <li><a href="home.html" style="color: #94a3b8; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Home</a></li>
+                        <li><a href="about.html" style="color: #94a3b8; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">About Us</a></li>
+                        <li><a href="work.html" style="color: #94a3b8; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Our Working</a></li>
+                        <li><a href="contact.html" style="color: white; text-decoration: none;">Contact</a></li>
+                        <li><a href="colab.html" style="color: #94a3b8; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Our Collaborators</a></li>
+                    </ul>
+                </div>
+                
+                <div class="reveal delay-2">
+                    <h4 style="margin-bottom: 20px;">Institution</h4>
+                    <p style="font-size: 0.9rem; color: #94a3b8;">Aditya Silver Oak Institute of Technology</p>
+                    <p style="font-size: 0.9rem; color: #94a3b8;">Silver Oak University</p>
+                </div>
+            </div>
+            
+            <div class="reveal delay-3" style="text-align: center; padding-top: 30px; border-top: 1px solid #1e293b; color: #94a3b8; font-size: 0.8rem;">
+                &copy; 2026 Lifynk | e-Blood Bank System. All rights reserved.
+            </div>
+        </div>
+    </footer>
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    </script>
+</body>
+</html>

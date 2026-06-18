@@ -1,0 +1,232 @@
+/* --- COMPLETE STANDALONE ABOUT CSS --- */
+
+:root {
+    --primary-teal: #0d9488;
+    --primary-dark: #0f172a;
+    --bg-light: #f0fdfa;
+    --white: #ffffff;
+    --text-gray: #475569;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: var(--white);
+    color: var(--primary-dark);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+/* HERO - SECTION*/
+
+.hero-section {
+    position: relative;
+    padding: 100px 0;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+    background-color: var(--primary-dark);
+    background-image: linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)), 
+                      url('https://plus.unsplash.com/premium_photo-1723114841540-0189f6449713?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8RGlnaXRhbCUyMEJsb29kJTIwQmFua3xlbnwwfHwwfHx8MA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Creates the Parallax effect */
+}
+
+/* --- REVEAL ENGINE --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.delay-1 { transition-delay: 0.2s; }
+.delay-2 { transition-delay: 0.4s; }
+.delay-3 { transition-delay: 0.6s; }
+.delay-4 { transition-delay: 0.8s; }
+.delay-5 { transition-delay: 1.0s; }
+
+/* --- NAVBAR --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 0 5%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    z-index: 1000;
+    background: rgb(255, 255, 255); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.logo img{
+    height: 50px;
+    width: auto;
+}
+
+.nav-links { 
+    display: flex; 
+    list-style: none; 
+    gap: 40px;
+    align-items: center;
+    margin-right: 60px; 
+}
+
+.nav-links a { 
+    text-decoration: none; 
+    color: #0f172a;
+    font-weight: 700; 
+    font-size: 15px; 
+    position: relative;
+    padding: 10px 0;
+    transition: 0.3s ease; 
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #0d9488; 
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover, .nav-links a.active { color: #0d9488; }
+.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+/* --- LOGIN BUTTON --- */
+.btn-login {
+    background: #0d9488; 
+    color: white !important;
+    padding: 10px 35px; 
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    transition: 0.3s all ease;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2);
+}
+
+.btn-login:hover {
+    background: #0f766e; 
+    transform: translateY(-2px);
+}
+
+
+/* --- CARDS --- */
+.card {
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --- ARCHITECTURE GRID --- */
+.section-padding { padding: 120px 0; }
+.bg-light { background-color: var(--bg-light); }
+.text-center { text-align: center; }
+
+.architecture-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.diag-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.1s ease, border-color 0.1s ease;
+    border: 1px solid rgba(13, 148, 136, 0.1);
+}
+
+.diag-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-teal);
+}
+
+.diag-icon {
+    font-size: 2.5rem;
+    color: var(--primary-teal);
+    margin-bottom: 20px;
+}
+
+/* --- ZIG-ZAG WORKFLOW --- */
+.zigzag {
+    display: flex;
+    align-items: flex-start;
+    gap: 80px;
+    margin-bottom: 100px;
+}
+
+.zigzag.reverse { flex-direction: row-reverse; }
+
+.zigzag-content { flex: 1; }
+
+.zigzag-image { 
+    flex: 0 0 auto; 
+    width: 30%;
+    overflow: hidden; 
+    border-radius: 20px;
+}
+
+.zigzag-image img {
+    width:auto;
+    max-height: 300px;
+    transition: transform 0.5s ease;
+    box-shadow: 0 0px 40px rgba(0,0,0,0.1);
+}
+
+.zigzag-image:hover img {
+    transform: scale(1.05);
+}
+
+.step-num {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: rgba(27, 27, 27, 0.1);
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* --- FOOTER LINKS --- */
+footer a {
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--primary-teal) !important;
+    padding-left: 5px;
+}

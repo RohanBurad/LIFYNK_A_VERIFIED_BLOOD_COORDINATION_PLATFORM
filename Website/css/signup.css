@@ -1,0 +1,334 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: #f0fdfa; /* Light Teal Background */
+    min-height: 100vh;
+}
+
+.signup-container {
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    background: white;
+    overflow: hidden; /* Prevents double scrollbars */
+}
+
+/* --- LEFT SIDE (IMAGE) --- */
+.signup-image {
+    width: 45%;
+    /* Community/Helping Hands Image */
+    background: url('https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=2000') no-repeat center center/cover;
+    position: relative;
+}
+
+.image-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* Teal Gradient */
+    background: linear-gradient(to bottom, rgba(13, 148, 136, 0.3), rgba(15, 23, 42, 0.9));
+    display: flex;
+    align-items: flex-end;
+    padding: 60px;
+}
+
+.quote-box h2 {
+    color: white;
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.1;
+}
+
+.quote-box p {
+    color: #cbd5e1;
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+/* --- RIGHT SIDE (SCROLLABLE FORM) --- */
+.signup-form-section {
+    width: 55%;
+    height: 100vh;
+    overflow-y: auto; /* ENABLE SCROLLING HERE */
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 480px;
+    margin-top: 20px;
+    margin-bottom: 60px; /* Extra space at bottom for scrolling */
+}
+
+/* --- HEADER & LOGO --- */
+.form-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.brand-logo {
+    width: auto;
+    height: 50px;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto; /* Centers the logo */
+    margin-right: auto;
+}
+
+.brand-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.form-header p {
+    color: #64748b;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #64748b;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    transition: color 0.3s;
+    /* Optional: If you want the 'Back' link to stay on the left, un-comment the line below */
+    /* float: left; width: 100%; */
+}
+
+/* --- TABS --- */
+.role-tabs {
+    display: flex;
+    background: #f1f5f9;
+    padding: 5px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    gap: 5px;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+.tab.active {
+    background: white;
+    color: #0d9488;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+}
+
+/* --- FORM STYLES --- */
+.signup-form {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.input-row {
+    display: flex;
+    gap: 15px;
+}
+
+.input-group {
+    margin-bottom: 18px;
+    width: 100%;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.input-group input, 
+.input-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background: #f8fafc;
+    transition: 0.3s;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    background: white;
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* --- VERIFICATION BOX (THE IMPORTANT PART) --- */
+.verification-box {
+    background: #f0fdfa; /* Light Teal background */
+    border: 1px dashed #0d9488;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f766e;
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.file-upload-wrapper {
+    border: 2px dashed #99f6e4;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.file-upload-wrapper:hover {
+    border-color: #0d9488;
+    background: #f0fdfa;
+}
+
+.file-upload-wrapper i {
+    font-size: 24px;
+    color: #0d9488;
+    margin-bottom: 8px;
+}
+
+.file-upload-wrapper p {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* This makes the actual file input invisible but clickable over the whole box */
+.file-upload-wrapper input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* --- BUTTON & LINKS --- */
+.terms {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terms a { color: #0d9488; text-decoration: none; font-weight: 600; }
+
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: #0d9488;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
+}
+
+.btn-submit:hover {
+    background: #0f766e;
+    transform: translateY(-2px);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.login-link a {
+    color: #0d9488;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+/* --- SIGNUP ANIMATIONS --- */
+.shake-error {
+    animation: shake 0.4s ease-in-out;
+    border-color: #e11d48 !important;
+    background-color: #fff1f2 !important;
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+}
+
+.btn-loading {
+    position: relative; color: transparent !important; pointer-events: none;
+}
+.btn-loading::after {
+    content: ""; position: absolute; width: 22px; height: 22px;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* File Drop Pulse */
+.file-drag-active {
+    border-color: #0d9488 !important; background: #ccfbf1 !important;
+    animation: pulseDrop 1.5s infinite;
+}
+@keyframes pulseDrop {
+    0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(13, 148, 136, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 900px) {
+    .signup-image { display: none; } /* Hide image on mobile */
+    .signup-form-section { width: 100%; padding: 20px; }
+    .form-wrapper { max-width: 100%; }
+}

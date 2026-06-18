@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Request Tracker | Lifynk</title>
+  <link rel="icon" href="../assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/dashboard-shared.css" />
+  <link rel="stylesheet" href="../css/hospital-dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --ok:#22c55e; --ok-dim:rgba(34,197,94,.12);
+      --warn:#f59e0b; --warn-dim:rgba(245,158,11,.12);
+      --danger-dim:rgba(225,29,72,.12);
+      --purple:#8b5cf6; --purple-dim:rgba(139,92,246,.12);
+      --orange:#f97316; --orange-dim:rgba(249,115,22,.12);
+      --blue:#3b82f6; --blue-dim:rgba(59,130,246,.12);
+    }
+
+    .r-grid { display:grid; gap:16px; }
+    .g-4  { grid-template-columns:repeat(4,1fr); }
+    .g-55 { grid-template-columns:1fr 1fr; }
+    .g-63 { grid-template-columns:6fr 3fr; }
+    @media(max-width:1100px){ .g-4{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:800px){ .g-55,.g-63{grid-template-columns:1fr} }
+
+    .r-card { background:var(--surface); border:1px solid var(--border-color); border-radius:16px; padding:22px; box-shadow:var(--card-shadow); transition:box-shadow .2s,transform .2s,background .3s; position:relative; overflow:hidden; }
+    .r-card:hover { box-shadow:var(--card-shadow-hover); transform:translateY(-2px); }
+    .r-card-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:6px; }
+    .r-card-value { font-size:32px; font-weight:800; line-height:1; color:var(--text-primary); }
+    .r-card-sub   { font-size:12px; color:var(--text-secondary); margin-top:6px; }
+    .r-card-icon  { position:absolute; right:20px; top:20px; width:40px; height:40px; border-radius:10px; display:grid; place-items:center; font-size:16px; }
+
+    .chip { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+    .chip-ok     { background:var(--ok-dim);      color:var(--ok); }
+    .chip-warn   { background:var(--warn-dim);    color:var(--warn); }
+    .chip-danger { background:var(--danger-dim);  color:var(--danger); }
+    .chip-teal   { background:rgba(13,148,136,.1);color:var(--primary); }
+    .chip-purple { background:var(--purple-dim);  color:var(--purple); }
+    .chip-orange { background:var(--orange-dim);  color:var(--orange); }
+    .chip-blue   { background:var(--blue-dim);    color:var(--blue); }
+
+    .sec-header { display:flex; align-items:center; gap:10px; margin:28px 0 14px; }
+    .sec-header h2 { font-size:18px; font-weight:800; color:var(--text-primary); }
+    .sec-tag { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(13,148,136,.1); color:var(--primary); text-transform:uppercase; letter-spacing:.05em; }
+
+    .sparkline { height:34px; overflow:hidden; margin-top:8px; }
+    .sparkline svg { width:100%; height:100%; }
+
+    /* Timeline */
+    .request-hero { background:linear-gradient(135deg,#0d1520 0%,#0f2027 100%); border:1px solid rgba(13,148,136,.25); border-radius:20px; padding:28px 32px; position:relative; overflow:hidden; margin-bottom:16px; }
+    .request-hero::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; background:radial-gradient(circle,rgba(13,148,136,.15) 0%,transparent 70%); pointer-events:none; }
+    .request-hero-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:16px; }
+    .request-hero-title { font-size:22px; font-weight:800; color:#fff; letter-spacing:-.3px; margin-bottom:6px; }
+    .request-hero-sub { font-size:13px; color:rgba(255,255,255,.5); }
+    .request-hero-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(13,148,136,.2); color:#2dd4bf; border:1px solid rgba(13,148,136,.3); padding:6px 14px; border-radius:99px; font-size:12px; font-weight:700; }
+    .hero-pulse { width:8px; height:8px; border-radius:50%; background:#2dd4bf; animation:blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .timeline { display:flex; align-items:flex-start; gap:0; position:relative; overflow-x:auto; padding-bottom:4px; }
+    .timeline-step { display:flex; flex-direction:column; align-items:center; flex:1; min-width:120px; position:relative; }
+    .timeline-step:not(:last-child)::after { content:''; position:absolute; top:18px; left:calc(50% + 18px); width:calc(100% - 36px); height:2px; background:rgba(255,255,255,.1); z-index:0; }
+    .timeline-step.done:not(:last-child)::after   { background:var(--primary); }
+    .timeline-step.active:not(:last-child)::after { background:linear-gradient(90deg,var(--primary),rgba(255,255,255,.1)); }
+    .timeline-dot { width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-size:14px; position:relative; z-index:1; flex-shrink:0; border:2px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:rgba(255,255,255,.3); transition:all .3s; }
+    .timeline-step.done   .timeline-dot { background:var(--primary); border-color:var(--primary); color:#fff; box-shadow:0 0 16px rgba(13,148,136,.5); }
+    .timeline-step.active .timeline-dot { background:rgba(13,148,136,.2); border-color:var(--primary); color:var(--primary); animation:ring-pulse 2s infinite; }
+    @keyframes ring-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(13,148,136,.4)} 50%{box-shadow:0 0 0 8px rgba(13,148,136,0)} }
+    .timeline-label { font-size:11px; font-weight:700; margin-top:10px; color:rgba(255,255,255,.35); text-align:center; white-space:nowrap; }
+    .timeline-step.done   .timeline-label { color:var(--primary); }
+    .timeline-step.active .timeline-label { color:#fff; }
+    .timeline-time { font-size:10px; color:rgba(255,255,255,.25); margin-top:3px; text-align:center; }
+    .timeline-step.done   .timeline-time { color:rgba(13,148,136,.7); }
+    .timeline-step.active .timeline-time { color:rgba(255,255,255,.5); }
+    .hero-details { display:flex; gap:28px; flex-wrap:wrap; margin-top:24px; padding-top:20px; border-top:1px solid rgba(255,255,255,.07); }
+    .hero-detail-item { display:flex; flex-direction:column; gap:3px; }
+    .hero-detail-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:rgba(255,255,255,.3); }
+    .hero-detail-val   { font-size:15px; font-weight:800; color:#fff; }
+
+    /* Donor card */
+    .donor-card { border:1px solid var(--border-color); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:14px; transition:background .15s,transform .15s; cursor:pointer; margin-bottom:10px; }
+    .donor-card:hover { background:rgba(13,148,136,.05); transform:translateX(3px); }
+    .donor-av { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--primary),#14b8a6); display:grid; place-items:center; color:#fff; font-size:14px; font-weight:800; flex-shrink:0; }
+    .donor-name { font-size:13.5px; font-weight:700; color:var(--text-primary); }
+    .donor-meta { font-size:11.5px; color:var(--text-secondary); margin-top:2px; }
+    .donor-verified { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; margin-left:6px; }
+    .verified   { background:var(--ok-dim);   color:var(--ok); }
+    .unverified { background:var(--warn-dim); color:var(--warn); }
+
+    /* Camp row */
+    .camp-row { display:flex; align-items:center; gap:14px; padding:13px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:10px; transition:background .15s,transform .15s; cursor:pointer; }
+    .camp-row:hover { background:rgba(13,148,136,.05); transform:translateX(3px); }
+    .camp-pill { width:48px; height:48px; border-radius:10px; background:var(--primary); display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
+    .camp-pill .day { font-size:17px; font-weight:800; color:#fff; line-height:1; }
+    .camp-pill .mon { font-size:9px; color:rgba(255,255,255,.8); font-weight:700; text-transform:uppercase; }
+
+    /* History table */
+    .h-table { width:100%; border-collapse:collapse; }
+    .h-table th { text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:0 12px 10px; border-bottom:1px solid var(--border-color); }
+    .h-table td { padding:13px 12px; font-size:13px; border-bottom:1px solid var(--border-color); vertical-align:middle; }
+    .h-table tr:last-child td { border-bottom:none; }
+    .h-table tr:hover td { background:rgba(13,148,136,.04); cursor:pointer; }
+
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:500; display:none; place-items:center; padding:20px; }
+    .modal-overlay.open { display:grid; }
+    .modal { background:var(--surface); border:1px solid var(--border-color); border-radius:20px; width:540px; max-width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 32px 80px rgba(0,0,0,.3); animation:modal-in .25s cubic-bezier(.4,0,.2,1); }
+    @keyframes modal-in { from{opacity:0;transform:translateY(24px) scale(.97)} }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:24px 28px 18px; border-bottom:1px solid var(--border-color); position:sticky; top:0; background:var(--surface); z-index:2; }
+    .modal-title { font-size:18px; font-weight:800; color:var(--text-primary); }
+    .modal-close { width:32px; height:32px; border-radius:8px; border:1px solid var(--border-color); background:none; cursor:pointer; display:grid; place-items:center; color:var(--text-muted); font-size:16px; }
+    .modal-close:hover { background:var(--danger-dim); color:var(--danger); }
+    .modal-body   { padding:24px 28px; }
+    .modal-footer { padding:0 28px 24px; display:flex; justify-content:flex-end; gap:10px; }
+    .form-row  { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+    .form-row.full { grid-template-columns:1fr; }
+    .form-field { display:flex; flex-direction:column; gap:6px; }
+    .form-field label { font-size:12px; font-weight:700; color:var(--text-secondary); }
+    .form-field input,.form-field select,.form-field textarea { background:var(--surface); border:1.5px solid var(--border-color); color:var(--text-primary); border-radius:9px; padding:10px 13px; font-family:inherit; font-size:13px; outline:none; transition:border .15s; width:100%; }
+    .form-field input:focus,.form-field select:focus,.form-field textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(13,148,136,.15); }
+    .form-field textarea { resize:vertical; min-height:80px; }
+
+    .toast { position:fixed; bottom:32px; right:32px; z-index:600; background:var(--primary); color:#fff; border-radius:12px; padding:14px 20px; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; box-shadow:0 8px 32px rgba(13,148,136,.4); transform:translateY(80px); opacity:0; transition:all .35s cubic-bezier(.4,0,.2,1); pointer-events:none; max-width:360px; }
+    .toast.show { transform:translateY(0); opacity:1; }
+
+    .fade-up { opacity:0; transform:translateY(18px); animation:fadeUp .5s forwards; }
+    @keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
+    .d1{animation-delay:.05s} .d2{animation-delay:.10s} .d3{animation-delay:.15s} .d4{animation-delay:.20s}
+
+    /* ── HEADER PROFILE DROPDOWN ─────────────────────────────── */
+    .header-avatar-wrap { position: relative; cursor: pointer; }
+    .header-profile-dropdown {
+      display: none; position: fixed; top: 68px; right: 20px;
+      width: 230px; background: var(--surface); border: 1px solid var(--border-color);
+      border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+      z-index: 9999; padding: 8px; animation: modal-in .2s ease;
+    }
+    .header-profile-dropdown.open { display: block; }
+    .hpd-header { display: flex; align-items: center; gap: 10px; padding: 10px 8px 12px; }
+    .hpd-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+    .hpd-name   { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .hpd-role   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .hpd-divider { height: 1px; background: var(--border-color); margin: 4px 0; }
+    .hpd-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+      cursor: pointer; transition: all .15s;
+    }
+    .hpd-item:hover { background: var(--primary-soft); color: var(--primary); }
+    .hpd-logout { color: var(--danger) !important; }
+    .hpd-logout:hover { background: rgba(225,29,72,.08) !important; }
+    .header-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; cursor:pointer; }
+  </style>
+</head>
+<body>
+<div class="dashboard-shell">
+
+  <!-- ═══════════ SIDEBAR ═══════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="../assets/favicon.png" alt="Lifynk" />
+      <span class="sidebar-brand-name">Lif<span>ynk</span></span>
+    </div>
+    <div class="role-badge">
+      <i class="fa-solid fa-user-injured"></i>
+      <span class="role-badge-text">Recipient</span>
+    </div>
+    <span class="nav-section-label">Main</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item active" href="#" data-section="overview">
+        <i class="fa-solid fa-border-all"></i><span>Overview</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="active">
+        <i class="fa-solid fa-circle-dot"></i><span>Active Request</span>
+        <span class="nav-badge">1</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="history">
+        <i class="fa-solid fa-clock-rotate-left"></i><span>Request History</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="donors">
+        <i class="fa-solid fa-users"></i><span>Nearby Donors</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="camps">
+        <i class="fa-solid fa-tent"></i><span>Upcoming Camps</span>
+      </a></li>
+    </ul>
+    <span class="nav-section-label">Account</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item" href="#" data-section="profile">
+        <i class="fa-solid fa-user"></i><span>Profile</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="settings">
+        <i class="fa-solid fa-gear"></i><span>Settings</span>
+      </a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <img src="https://ui-avatars.com/api/?name=Neha+Shah&background=e11d48&color=fff&size=80" alt="Neha" class="sidebar-avatar" id="sidebarAvatar" />
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName">Neha Shah</div>
+          <div class="sidebar-user-role" id="sidebarRole">B+ · Ahmedabad</div>
+        </div>
+        <i class="fa-solid fa-arrow-right-from-bracket" style="color:var(--text-muted);font-size:13px;cursor:pointer;margin-left:auto;"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ══════════════════════════════════════ -->
+  <main class="main-content">
+
+    <div class="top-header">
+      <div class="header-left">
+        <h1>Request Tracker 🩸</h1>
+        <p id="headerSubtitle">Sunday, 22 March 2026 · Ahmedabad, Gujarat</p>
+      </div>
+      <div class="header-right">
+        <button class="btn-primary" onclick="openRequestModal()" style="margin-right:4px"><i class="fa-solid fa-plus"></i> New Request</button>
+        <button class="theme-toggle-btn" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button class="notif-btn" id="recipientNotifBtn" style="position:relative">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notif-dot" id="recipientNotifDot" style="display:none"></span>
+          <span id="recipientNotifCount" style="display:none;position:absolute;top:-4px;right:-4px;background:#e11d48;color:#fff;font-size:10px;font-weight:800;border-radius:99px;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px"></span>
+        </button>
+
+        <!-- Notification Panel -->
+        <div id="recipientNotifPanel" style="display:none;position:fixed;width:320px;max-height:440px;overflow-y:auto;background:var(--surface);border:1px solid var(--border-color);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.22);z-index:9999">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2">
+            <span style="font-size:13px;font-weight:800;color:var(--text-primary)"><i class="fa-solid fa-bell" style="color:var(--primary);margin-right:8px"></i>Notifications</span>
+            <button onclick="window.markAllRecipientNotifsRead()" style="font-size:11px;font-weight:700;color:var(--primary);background:none;border:none;cursor:pointer">Mark all read</button>
+          </div>
+          <div id="recipientNotifList">
+            <div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">
+              <i class="fa-solid fa-bell-slash" style="display:block;margin-bottom:8px;font-size:22px;opacity:.4"></i>No new notifications
+            </div>
+          </div>
+        </div>
+        
+        <div class="header-avatar-wrap" id="headerAvatarWrap">
+          <div id="headerAvatarPlaceholder"
+               style="width:36px;height:36px;border-radius:50%;background:var(--border-color);animation:pulse 1.5s infinite">
+          </div>
+          <img id="headerAvatar" src="" alt="Avatar" class="header-avatar" style="display:none">
+        </div>
+        <div class="header-profile-dropdown" id="headerDropdown">
+          <div class="hpd-header">
+            <img id="hdpAvatar" src="https://ui-avatars.com/api/?name=User&background=0d9488&color=fff&size=80" class="hpd-avatar">
+            <div>
+              <div class="hpd-name" id="hdpName"></div>
+              <div class="hpd-role">🤕 Recipient</div>
+            </div>
+          </div>
+          <div class="hpd-divider"></div>
+          <div class="hpd-item" onclick="document.getElementById('profilePhotoInput').click()">
+            <i class="fa-solid fa-camera"></i> Change Photo
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+          </div>
+          <div class="hpd-item" onclick="document.getElementById('headerDropdown').classList.remove('open')">
+            <i class="fa-solid fa-user"></i> My Profile
+          </div>
+          <div class="hpd-divider"></div>
+          <div class="hpd-item hpd-logout" id="logoutBtn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OVERVIEW ════════════════════════════════════ -->
+    <section id="sec-overview">
+      <!-- KPI -->
+      <div class="r-grid g-4 fade-up d1" style="margin-bottom:16px">
+        <div class="r-card">
+          <div class="r-card-label">Total Requests</div>
+          <div class="r-card-value" id="kpiTotal">0</div>
+          <div class="r-card-sub"><span class="chip chip-teal">Lifetime</span></div>
+          <div class="r-card-icon" style="background:rgba(13,148,136,.1);color:var(--primary)"><i class="fa-solid fa-droplet"></i></div>
+          <div class="sparkline"><svg id="sp1" viewBox="0 0 100 36" preserveAspectRatio="none"></svg></div>
+        </div>
+        <div class="r-card">
+          <div class="r-card-label">Fulfilled</div>
+          <div class="r-card-value" id="kpiFulfilled" style="color:var(--ok)">0</div>
+          <div class="r-card-sub"><span class="chip chip-ok">Successfully matched</span></div>
+          <div class="r-card-icon" style="background:var(--ok-dim);color:var(--ok)"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="sparkline"><svg id="sp2" viewBox="0 0 100 36" preserveAspectRatio="none"></svg></div>
+        </div>
+        <div class="r-card">
+          <div class="r-card-label">Active Now</div>
+          <div class="r-card-value" id="kpiActive" style="color:var(--warn)">0</div>
+          <div class="r-card-sub"><span class="chip chip-warn">In progress</span></div>
+          <div class="r-card-icon" style="background:var(--warn-dim);color:var(--warn)"><i class="fa-regular fa-clock"></i></div>
+          <div class="sparkline"><svg id="sp3" viewBox="0 0 100 36" preserveAspectRatio="none"></svg></div>
+        </div>
+        <div class="r-card">
+          <div class="r-card-label">Avg Match Time</div>
+          <div class="r-card-value">1.8<span style="font-size:16px;font-weight:600;color:var(--text-muted)">h</span></div>
+          <div class="r-card-sub"><span class="chip chip-ok">↓ faster than avg</span></div>
+          <div class="r-card-icon" style="background:var(--purple-dim);color:var(--purple)"><i class="fa-solid fa-bolt"></i></div>
+        </div>
+      </div>
+
+      <!-- Active Request Timeline -->
+      <div class="sec-header fade-up d2">
+        <h2>Active Request</h2><span class="sec-tag">Live</span>
+        <div style="margin-left:auto"><button class="btn-primary" onclick="openRequestModal()" style="font-size:12px;padding:8px 14px"><i class="fa-solid fa-plus"></i> New Request</button></div>
+      </div>
+      <div class="request-hero fade-up d2">
+        <div class="request-hero-top">
+          <div>
+            <div class="request-hero-title">B+ Blood Required — 2 Units</div>
+            <div class="request-hero-sub">Request #RS-2026-0317 · Apollo Hospital, Satellite Road · Submitted 3 hrs ago</div>
+          </div>
+          <div class="request-hero-badge"><div class="hero-pulse"></div>Donor Found — In Transit</div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-step done"><div class="timeline-dot"><i class="fa-solid fa-file-circle-check"></i></div><div class="timeline-label">Submitted</div><div class="timeline-time">09:14 AM</div></div>
+          <div class="timeline-step done"><div class="timeline-dot"><i class="fa-solid fa-magnifying-glass"></i></div><div class="timeline-label">NGO Review</div><div class="timeline-time">09:31 AM</div></div>
+          <div class="timeline-step active"><div class="timeline-dot"><i class="fa-solid fa-user-check"></i></div><div class="timeline-label">Donor Found</div><div class="timeline-time">Now</div></div>
+          <div class="timeline-step"><div class="timeline-dot"><i class="fa-solid fa-heart-pulse"></i></div><div class="timeline-label">Fulfilled</div><div class="timeline-time">—</div></div>
+        </div>
+        <div class="hero-details">
+          <div class="hero-detail-item"><div class="hero-detail-label">Blood Group</div><div class="hero-detail-val" style="color:#f87171">B+</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Units Needed</div><div class="hero-detail-val">2 Units</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Urgency</div><div class="hero-detail-val" style="color:#fbbf24">High</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Hospital</div><div class="hero-detail-val">Apollo, Satellite</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Assigned Donor</div><div class="hero-detail-val" style="color:#2dd4bf">Manish Patel</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">ETA</div><div class="hero-detail-val" style="color:#2dd4bf">~35 min</div></div>
+        </div>
+      </div>
+
+      <!-- Donors + Camps -->
+      <div class="r-grid g-55 fade-up d3" style="margin-bottom:16px;align-items:start">
+        <div class="r-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:15px;font-weight:800;color:var(--text-primary)">Nearby Donors</span>
+            <span class="chip chip-teal">B+ Compatible</span>
+            <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Within 10 km</span>
+          </div>
+          <div id="donorListOv"></div>
+        </div>
+        <div class="r-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:15px;font-weight:800;color:var(--text-primary)">Nearby Camps</span>
+            <span class="chip chip-orange">Near You</span>
+          </div>
+          <div class="camp-row">
+            <div class="camp-pill"><div class="day">22</div><div class="mon">Mar</div></div>
+            <div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:var(--text-primary)">Red Cross Blood Drive</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px"><i class="fa-solid fa-location-dot" style="color:var(--primary);font-size:10px;margin-right:4px"></i>Silver Oak University · 1.2 km</div></div>
+            <button class="btn-primary" style="font-size:11px;padding:7px 12px;flex-shrink:0">Register</button>
+          </div>
+          <div class="camp-row">
+            <div class="camp-pill" style="background:var(--purple)"><div class="day">05</div><div class="mon">Apr</div></div>
+            <div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:var(--text-primary)">City Civil NGO Camp</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px"><i class="fa-solid fa-location-dot" style="color:var(--primary);font-size:10px;margin-right:4px"></i>Law Garden · 3.8 km</div></div>
+            <button class="btn-ghost" style="font-size:11px;padding:7px 12px;flex-shrink:0">Remind</button>
+          </div>
+          <div class="camp-row">
+            <div class="camp-pill" style="background:var(--orange)"><div class="day">12</div><div class="mon">Apr</div></div>
+            <div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:var(--text-primary)">SBT Mega Blood Camp</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px"><i class="fa-solid fa-location-dot" style="color:var(--primary);font-size:10px;margin-right:4px"></i>CIMS Hospital · 5.1 km</div></div>
+            <button class="btn-ghost" style="font-size:11px;padding:7px 12px;flex-shrink:0">Remind</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History table on overview -->
+      <div class="sec-header fade-up d4"><h2>Request History</h2><span class="sec-tag">5 requests</span><a class="card-action" href="#" style="margin-left:auto"><i class="fa-solid fa-download" style="margin-right:4px"></i>Export</a></div>
+      <div class="r-card fade-up d4"><table class="h-table"><thead><tr><th>Request ID</th><th>Blood Group</th><th>Units</th><th>Hospital</th><th>Date</th><th>Urgency</th><th>Status</th><th>Donor</th></tr></thead><tbody id="historyBodyOv"></tbody></table></div>
+    </section>
+
+    <!-- ══════════ ACTIVE REQUEST ══════════════════════════════ -->
+    <section id="sec-active" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Active Request</h2><span class="sec-tag">Live</span><button class="btn-primary" style="margin-left:auto" onclick="openRequestModal()"><i class="fa-solid fa-plus"></i> New Request</button></div>
+      <div class="request-hero fade-up d2">
+        <div class="request-hero-top">
+          <div><div class="request-hero-title">B+ Blood Required — 2 Units</div><div class="request-hero-sub">Request #RS-2026-0317 · Apollo Hospital, Satellite Road</div></div>
+          <div class="request-hero-badge"><div class="hero-pulse"></div>Donor Found — In Transit</div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-step done"><div class="timeline-dot"><i class="fa-solid fa-file-circle-check"></i></div><div class="timeline-label">Submitted</div><div class="timeline-time">09:14 AM</div></div>
+          <div class="timeline-step done"><div class="timeline-dot"><i class="fa-solid fa-magnifying-glass"></i></div><div class="timeline-label">NGO Review</div><div class="timeline-time">09:31 AM</div></div>
+          <div class="timeline-step active"><div class="timeline-dot"><i class="fa-solid fa-user-check"></i></div><div class="timeline-label">Donor Found</div><div class="timeline-time">Now</div></div>
+          <div class="timeline-step"><div class="timeline-dot"><i class="fa-solid fa-heart-pulse"></i></div><div class="timeline-label">Fulfilled</div><div class="timeline-time">—</div></div>
+        </div>
+        <div class="hero-details">
+          <div class="hero-detail-item"><div class="hero-detail-label">Blood Group</div><div class="hero-detail-val" style="color:#f87171">B+</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Units</div><div class="hero-detail-val">2</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Urgency</div><div class="hero-detail-val" style="color:#fbbf24">High</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Hospital</div><div class="hero-detail-val">Apollo, Satellite</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">Donor</div><div class="hero-detail-val" style="color:#2dd4bf">Manish Patel</div></div>
+          <div class="hero-detail-item"><div class="hero-detail-label">ETA</div><div class="hero-detail-val" style="color:#2dd4bf">~35 min</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ REQUEST HISTORY ═════════════════════════════ -->
+    <section id="sec-history" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Request History</h2><span class="sec-tag">All Time</span><button class="btn-ghost" style="margin-left:auto;font-size:12px"><i class="fa-solid fa-download"></i> Export</button></div>
+      <div class="r-card fade-up d2"><table class="h-table"><thead><tr><th>Request ID</th><th>Blood Group</th><th>Units</th><th>Hospital</th><th>Date</th><th>Urgency</th><th>Status</th><th>Donor</th></tr></thead><tbody id="historyBodyFull"></tbody></table></div>
+    </section>
+
+    <!-- ══════════ NEARBY DONORS ═══════════════════════════════ -->
+    <section id="sec-donors" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Nearby Donors</h2><span class="sec-tag">B+ Compatible</span></div>
+      <div class="r-card fade-up d2"><div id="donorListFull"></div></div>
+    </section>
+
+    <!-- ══════════ UPCOMING CAMPS ══════════════════════════════ -->
+    <section id="sec-camps" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Upcoming Camps</h2><span class="sec-tag">Near Ahmedabad</span></div>
+      <div id="campsFull" class="fade-up d2"></div>
+    </section>
+
+    <!-- ══════════ PROFILE ═════════════════════════════════════ -->
+    <section id="sec-profile" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Profile</h2><span class="sec-tag">Account</span></div>
+      <div class="r-card fade-up d2" style="max-width:600px">
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+          <img src="https://ui-avatars.com/api/?name=Neha+Shah&background=e11d48&color=fff&size=160" style="width:72px;height:72px;border-radius:50%;flex-shrink:0"/>
+          <div><div style="font-size:18px;font-weight:800;color:var(--text-primary)">Neha Shah</div><div style="font-size:13px;color:var(--text-muted);margin-top:3px">B+ · Ahmedabad</div><span class="chip chip-teal" style="margin-top:8px"><i class="fa-solid fa-user-injured"></i> Recipient</span></div>
+        </div>
+        <div class="form-row"><div class="form-field"><label>Full Name</label><input type="text" value="Neha Shah"/></div><div class="form-field"><label>Blood Group</label><select><option>B+</option><option>B−</option><option>O+</option><option>O−</option><option>A+</option><option>A−</option><option>AB+</option><option>AB−</option></select></div></div>
+        <div class="form-row"><div class="form-field"><label>Phone</label><input type="tel" value="+91 87654 32109"/></div><div class="form-field"><label>Email</label><input type="email" value="neha.shah@email.com"/></div></div>
+        <div class="form-row full"><div class="form-field"><label>City</label><input type="text" value="Ahmedabad"/></div></div>
+        <div style="margin-top:16px;display:flex;gap:10px">
+          <button class="btn-primary" onclick="showToast('✅ Profile saved')"><i class="fa-solid fa-check"></i> Save Changes</button>
+          <button class="btn-ghost">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SETTINGS ════════════════════════════════════ -->
+    <section id="sec-settings" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Settings</h2><span class="sec-tag">Preferences</span></div>
+      <div class="r-card fade-up d2" style="max-width:600px">
+        <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:16px">Notifications</p>
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;font-weight:700;color:var(--text-primary)">Request status updates</div><div style="font-size:12px;color:var(--text-muted)">When donor is matched or request is fulfilled</div></div><div style="width:40px;height:22px;background:var(--primary);border-radius:99px;cursor:pointer;position:relative"><div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;right:2px"></div></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;font-weight:700;color:var(--text-primary)">Camp announcements</div><div style="font-size:12px;color:var(--text-muted)">Nearby blood camps and drives</div></div><div style="width:40px;height:22px;background:var(--primary);border-radius:99px;cursor:pointer;position:relative"><div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;right:2px"></div></div></div>
+        </div>
+        <button class="btn-primary" onclick="document.getElementById('themeToggle').click()"><i class="fa-solid fa-circle-half-stroke"></i> Toggle Dark Mode</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- New Request Modal -->
+<div class="modal-overlay" id="requestModalOverlay" onclick="closeRequestModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title"><i class="fa-solid fa-droplet" style="color:var(--danger);margin-right:8px"></i>New Blood Request</div><div style="font-size:12px;color:var(--text-muted);margin-top:3px">Your request will be reviewed by a nearby NGO</div></div>
+      <button class="modal-close" onclick="closeRequestModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-field"><label>Patient Name *</label><input type="text" id="reqPatient" placeholder="e.g. Neha Shah" /></div><div class="form-field"><label>Blood Group *</label><select id="reqBloodGroup"><option value="">Select</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select></div></div>
+      <div class="form-row"><div class="form-field"><label>Units Required *</label><input type="number" id="reqUnits" placeholder="e.g. 2" min="1" max="10" /></div><div class="form-field"><label>Urgency *</label><select id="reqUrgency"><option value="">Select</option><option>Normal</option><option>High</option><option>Critical — Emergency</option></select></div></div>
+      <div class="form-row"><div class="form-field"><label>Hospital Name *</label><input type="text" id="reqHospital" placeholder="e.g. Apollo Hospital" /></div><div class="form-field"><label>City *</label><input type="text" id="reqCity" value="Ahmedabad" /></div></div>
+      <div class="form-row"><div class="form-field"><label>Contact Number *</label><input type="tel" id="reqPhone" placeholder="+91 XXXXX XXXXX" /></div><div class="form-field"><label>Required By</label><input type="datetime-local" id="reqDeadline" /></div></div>
+      <div class="form-row full"><div class="form-field"><label>Additional Notes</label><input type="text" id="reqNotes" placeholder="Ward, doctor name, prescription number..." /></div></div>
+      <div style="margin-top:4px">
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:6px">Prescription (optional)</label>
+        <label style="display:flex;align-items:center;gap:10px;background:rgba(13,148,136,.06);border:1.5px dashed rgba(13,148,136,.25);border-radius:9px;padding:12px 16px;cursor:pointer" id="uploadLabel">
+          <i class="fa-solid fa-cloud-arrow-up" style="color:var(--primary);font-size:18px"></i>
+          <span style="font-size:13px;color:var(--text-muted)" id="uploadText">Click to upload image or PDF</span>
+          <input type="file" accept="image/*,.pdf" style="display:none" onchange="if(this.files[0])document.getElementById('uploadText').textContent='✅ '+this.files[0].name" />
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeRequestModal()">Cancel</button>
+      <button class="btn-primary" id="submitReqBtn" onclick="submitRequest()"><i class="fa-solid fa-paper-plane"></i> Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done!</span></div>
+
+<script type="module" src="../js/recipient.js"></script>
+</body>
+</html>

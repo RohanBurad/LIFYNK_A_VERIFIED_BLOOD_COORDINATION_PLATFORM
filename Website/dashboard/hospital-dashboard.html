@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Command Center | Lifynk</title>
+  <link rel="icon" href="../assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/dashboard-shared.css" />
+  <link rel="stylesheet" href="../css/hospital-dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <style>
+    :root {
+      --purple:#8b5cf6; --purple-dim:rgba(139,92,246,.12);
+      --orange:#f97316; --orange-dim:rgba(249,115,22,.12);
+      --ok:#22c55e;     --ok-dim:rgba(34,197,94,.12);
+      --warn:#f59e0b;   --warn-dim:rgba(245,158,11,.12);
+      --danger-dim:rgba(225,29,72,.12);
+      --blue:#3b82f6;   --blue-dim:rgba(59,130,246,.12);
+    }
+
+    /* ── GRID ──────────────────────────────────────────────── */
+    .h-grid { display:grid; gap:16px; }
+    .g-4 { grid-template-columns:repeat(4,1fr); }
+    .g-3 { grid-template-columns:repeat(3,1fr); }
+    .g-2 { grid-template-columns:1fr 1fr; }
+    .g-63{ grid-template-columns:6fr 3fr; }
+    .g-82{ grid-template-columns:8fr 2fr; }
+    @media(max-width:1200px){ .g-4{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:860px){ .g-3,.g-63,.g-82,.g-2{grid-template-columns:1fr} }
+
+    /* ── CARD ──────────────────────────────────────────────── */
+    .h-card { background:var(--surface); border:1px solid var(--border-color); border-radius:16px; padding:22px; box-shadow:var(--card-shadow); transition:box-shadow .2s,transform .2s,background .3s; position:relative; overflow:hidden; }
+    .h-card:hover { box-shadow:var(--card-shadow-hover); transform:translateY(-2px); }
+    .h-card-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:6px; }
+    .h-card-value { font-size:32px; font-weight:800; line-height:1; color:var(--text-primary); }
+    .h-card-sub   { font-size:12px; color:var(--text-secondary); margin-top:6px; }
+    .h-card-icon  { position:absolute; right:20px; top:20px; width:40px; height:40px; border-radius:10px; display:grid; place-items:center; font-size:16px; }
+
+    /* ── CHIP ──────────────────────────────────────────────── */
+    .chip { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+    .chip-ok     { background:var(--ok-dim);      color:var(--ok); }
+    .chip-warn   { background:var(--warn-dim);    color:var(--warn); }
+    .chip-danger { background:var(--danger-dim);  color:var(--danger); }
+    .chip-teal   { background:rgba(13,148,136,.1);color:var(--primary); }
+    .chip-purple { background:var(--purple-dim);  color:var(--purple); }
+    .chip-orange { background:var(--orange-dim);  color:var(--orange); }
+    .chip-blue   { background:var(--blue-dim);    color:var(--blue); }
+    .chip-muted  { background:var(--border-color);color:var(--text-muted); }
+
+    /* ── SECTION HEADER ────────────────────────────────────── */
+    .sec-header { display:flex; align-items:center; gap:10px; margin:28px 0 14px; }
+    .sec-header h2 { font-size:18px; font-weight:800; color:var(--text-primary); }
+    .sec-tag { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(13,148,136,.1); color:var(--primary); text-transform:uppercase; letter-spacing:.05em; }
+
+    /* ── TABLE ─────────────────────────────────────────────── */
+    .h-table { width:100%; border-collapse:collapse; }
+    .h-table th { text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:0 12px 10px; border-bottom:1px solid var(--border-color); }
+    .h-table td { padding:12px; font-size:13px; border-bottom:1px solid var(--border-color); vertical-align:middle; }
+    .h-table tr:last-child td { border-bottom:none; }
+    .h-table tr:hover td { background:rgba(13,148,136,.04); }
+    .h-avatar { width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,var(--primary),#14b8a6); display:grid; place-items:center; color:#fff; font-size:12px; font-weight:800; flex-shrink:0; }
+
+    /* ── SPARKLINE ─────────────────────────────────────────── */
+    .sparkline { height:36px; overflow:hidden; margin-top:8px; }
+    .sparkline svg { width:100%; height:100%; }
+
+    /* ── PROGRESS RING ─────────────────────────────────────── */
+    .ring-wrap { position:relative; width:80px; height:80px; flex-shrink:0; }
+    .ring-wrap svg { transform:rotate(-90deg); }
+    .ring-bg   { fill:none; stroke:var(--border-color); stroke-width:7; }
+    .ring-fill { fill:none; stroke-width:7; stroke-linecap:round; transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1); }
+    .ring-label{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .ring-val  { font-size:17px; font-weight:900; line-height:1; color:var(--text-primary); }
+    .ring-sub  { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-top:1px; }
+
+    /* ── BLOOD INVENTORY GRID ──────────────────────────────── */
+    .inv-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    @media(max-width:1100px){ .inv-grid{grid-template-columns:repeat(2,1fr)} }
+    .inv-card { border-radius:14px; padding:16px 18px; border:1.5px solid var(--border-color); background:var(--surface); transition:all .2s; cursor:default; }
+    .inv-card:hover { transform:translateY(-2px); box-shadow:var(--card-shadow-hover); }
+    .inv-card.critical { border-color:rgba(225,29,72,.4); background:rgba(225,29,72,.04); }
+    .inv-card.low      { border-color:rgba(245,158,11,.4); background:rgba(245,158,11,.04); }
+    .inv-card.ok       { border-color:rgba(34,197,94,.3);  background:rgba(34,197,94,.04); }
+    .inv-bg-label { font-size:22px; font-weight:900; letter-spacing:-.5px; }
+    .inv-units    { font-size:28px; font-weight:800; line-height:1.1; margin:6px 0 4px; }
+    .inv-bar-wrap { height:5px; background:var(--border-color); border-radius:99px; overflow:hidden; margin-top:8px; }
+    .inv-bar      { height:5px; border-radius:99px; transition:width 1s ease; }
+
+    /* ── AUDIT TRAIL ───────────────────────────────────────── */
+    .audit-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border-color); align-items:flex-start; }
+    .audit-item:last-child { border-bottom:none; }
+    .audit-icon { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-size:14px; flex-shrink:0; }
+    .audit-body { flex:1; }
+    .audit-title{ font-size:13px; font-weight:700; color:var(--text-primary); }
+    .audit-meta { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+    .audit-time { font-size:11px; color:var(--text-muted); white-space:nowrap; flex-shrink:0; }
+
+    /* ── SURGERY ITEMS ─────────────────────────────────────── */
+    .surgery-row-bg { font-size:13px; font-weight:800; color:var(--danger); }
+    .surgery-status-covered  { color:var(--ok); }
+    .surgery-status-pending  { color:var(--warn); }
+    .surgery-status-critical { color:var(--danger); }
+
+    /* ── DONOR MATCH FILTER ────────────────────────────────── */
+    .bg-filter-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+    .bg-filter-btn { padding:7px 16px; border-radius:99px; font-size:12px; font-weight:700; border:1.5px solid var(--border-color); background:none; color:var(--text-secondary); cursor:pointer; transition:all .15s; font-family:inherit; }
+    .bg-filter-btn.active { background:rgba(225,29,72,.1); border-color:var(--danger); color:var(--danger); }
+    .bg-filter-btn.all-btn.active { background:rgba(13,148,136,.1); border-color:var(--primary); color:var(--primary); }
+
+    /* ── LIVE REQUEST STATUS CHIPS ─────────────────────────── */
+    .req-open        { background:var(--blue-dim);    color:var(--blue); }
+    .req-acknowledged{ background:var(--orange-dim);  color:var(--orange); }
+    .req-in_progress { background:var(--purple-dim);  color:var(--purple); }
+    .req-dispatched  { background:rgba(13,148,136,.1);color:var(--primary); }
+    .req-received    { background:var(--ok-dim);      color:var(--ok); }
+    .req-cancelled   { background:var(--border-color);color:var(--text-muted); }
+
+    /* ── URGENCY ───────────────────────────────────────────── */
+    .urg-critical { background:var(--danger-dim); color:var(--danger); }
+    .urg-urgent   { background:var(--warn-dim);   color:var(--warn); }
+    .urg-routine  { background:var(--ok-dim);     color:var(--ok); }
+
+    /* ── BLOOD GROUP PICKER ────────────────────────────────── */
+    .bg-picker { display:flex; flex-wrap:wrap; gap:8px; }
+    .bg-btn { padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; border:1.5px solid var(--border-color); background:none; color:var(--text-secondary); cursor:pointer; transition:all .15s; font-family:inherit; }
+    .bg-btn.selected { background:rgba(225,29,72,.1); border-color:var(--danger); color:var(--danger); }
+
+    /* ── TOPBAR ALERT ──────────────────────────────────────── */
+    .topbar-alert { display:flex; align-items:center; gap:8px; background:var(--orange-dim); border:1px solid rgba(249,115,22,.3); color:var(--orange); border-radius:20px; padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer; }
+    .blink-dot { width:8px; height:8px; border-radius:50%; background:var(--orange); animation:blink 1s infinite; flex-shrink:0; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── MAP ───────────────────────────────────────────────── */
+    #donorMap { width:100%; height:300px; border-radius:12px; overflow:hidden; border:1px solid var(--border-color); }
+    .leaflet-pane { z-index:1 !important; } .leaflet-top,.leaflet-bottom { z-index:2 !important; }
+
+    /* ── MODAL ─────────────────────────────────────────────── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:500; display:none; place-items:center; padding:20px; }
+    .modal-overlay.open { display:grid; }
+    .modal { background:var(--surface); border:1px solid var(--border-color); border-radius:20px; width:680px; max-width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 32px 80px rgba(0,0,0,.3); animation:modal-in .25s cubic-bezier(.4,0,.2,1); }
+    @keyframes modal-in { from{opacity:0;transform:translateY(24px) scale(.97)} }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:24px 28px 18px; position:sticky; top:0; background:var(--surface); z-index:2; border-bottom:1px solid var(--border-color); }
+    .modal-title  { font-size:18px; font-weight:800; color:var(--text-primary); }
+    .modal-close  { width:32px; height:32px; border-radius:8px; border:1px solid var(--border-color); background:none; cursor:pointer; display:grid; place-items:center; color:var(--text-muted); font-size:16px; }
+    .modal-close:hover { background:var(--danger-dim); color:var(--danger); }
+    .modal-body   { padding:24px 28px; }
+    .modal-footer { padding:0 28px 24px; display:flex; justify-content:flex-end; gap:10px; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .form-grid.full { grid-template-columns:1fr; }
+    .form-field { display:flex; flex-direction:column; gap:6px; }
+    .form-field label { font-size:12px; font-weight:700; color:var(--text-secondary); }
+    .form-field input,.form-field select,.form-field textarea { background:var(--surface); border:1.5px solid var(--border-color); color:var(--text-primary); border-radius:9px; padding:10px 13px; font-family:inherit; font-size:13px; outline:none; transition:border .15s; width:100%; box-sizing:border-box; }
+    .form-field input:focus,.form-field select:focus,.form-field textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(13,148,136,.15); }
+    .form-field textarea { resize:vertical; min-height:72px; }
+
+    /* ── HEADER PROFILE DROPDOWN ───────────────────────────── */
+    .header-avatar-wrap { position:relative; cursor:pointer; }
+    .header-profile-dropdown { display:none; position:fixed; top:68px; right:20px; width:230px; background:var(--surface); border:1px solid var(--border-color); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.22); z-index:9999; padding:8px; animation:modal-in .2s ease; }
+    .header-profile-dropdown.open { display:block; }
+    .hpd-header  { display:flex; align-items:center; gap:10px; padding:10px 8px 12px; }
+    .hpd-avatar  { width:42px; height:42px; border-radius:50%; border:2px solid var(--primary); object-fit:cover; }
+    .hpd-name    { font-size:13px; font-weight:700; color:var(--text-primary); }
+    .hpd-role    { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .hpd-divider { height:1px; background:var(--border-color); margin:4px 0; }
+    .hpd-item    { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; font-size:13px; font-weight:600; color:var(--text-secondary); cursor:pointer; transition:all .15s; }
+    .hpd-item:hover { background:var(--primary-soft,rgba(13,148,136,.08)); color:var(--primary); }
+    .hpd-logout  { color:var(--danger) !important; }
+    .hpd-logout:hover { background:rgba(225,29,72,.08) !important; }
+    .header-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; cursor:pointer; }
+
+    /* ── TOAST ─────────────────────────────────────────────── */
+    .toast { position:fixed; bottom:32px; right:32px; z-index:600; background:var(--primary); color:#fff; border-radius:12px; padding:14px 20px; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; box-shadow:0 8px 32px rgba(13,148,136,.4); transform:translateY(80px); opacity:0; transition:all .35s cubic-bezier(.4,0,.2,1); pointer-events:none; }
+    .toast.show { transform:translateY(0); opacity:1; }
+
+    /* ── EMPTY STATE ───────────────────────────────────────── */
+    .empty-state { text-align:center; padding:56px 0; }
+    .empty-state i { font-size:36px; color:var(--border-color); display:block; margin-bottom:12px; }
+    .empty-state h3 { font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:6px; }
+    .empty-state p  { font-size:13px; color:var(--text-muted); }
+
+    /* ── COMMAND CENTER ALERT BANNER ───────────────────────── */
+    .alert-banner { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-radius:12px; margin-bottom:10px; }
+    .alert-banner.critical { background:var(--danger-dim); border:1px solid rgba(225,29,72,.25); }
+    .alert-banner.warning  { background:var(--warn-dim);   border:1px solid rgba(245,158,11,.25); }
+    .alert-banner.info     { background:var(--blue-dim);   border:1px solid rgba(59,130,246,.25); }
+
+    /* ── TIMELINE CONNECTOR ────────────────────────────────── */
+    .timeline-wrap { position:relative; padding-left:28px; }
+    .timeline-wrap::before { content:''; position:absolute; left:11px; top:0; bottom:0; width:2px; background:var(--border-color); }
+    .timeline-dot { position:absolute; left:0; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; font-size:10px; }
+
+    /* ── FADE ANIMATIONS ───────────────────────────────────── */
+    .fade-up { opacity:0; transform:translateY(18px); animation:fadeUp .5s forwards; }
+    @keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
+    .d1{animation-delay:.05s} .d2{animation-delay:.10s} .d3{animation-delay:.15s} .d4{animation-delay:.20s}
+
+    /* ── SPINNER ───────────────────────────────────────────── */
+    .loading-spinner { text-align:center; padding:48px 0; }
+    .loading-spinner i { font-size:24px; color:var(--primary); display:block; margin-bottom:10px; }
+    .loading-spinner p { font-size:13px; color:var(--text-muted); }
+  </style>
+</head>
+<body>
+<div class="dashboard-shell">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="../assets/favicon.png" alt="Lifynk"/>
+      <span class="sidebar-brand-name">Lif<span>ynk</span></span>
+    </div>
+    <div class="role-badge">
+      <i class="fa-solid fa-hospital"></i>
+      <span class="role-badge-text">Hospital</span>
+    </div>
+
+    <span class="nav-section-label">Main</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item active" href="#" data-section="commandcenter">
+        <i class="fa-solid fa-border-all"></i><span>Command Center</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="bloodinventory">
+        <i class="fa-solid fa-droplet"></i><span>Blood Inventory</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="donormatch">
+        <i class="fa-solid fa-users"></i><span>Donor Match</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="surgeryschedule">
+        <i class="fa-regular fa-calendar-days"></i><span>Surgery Schedule</span>
+        <span class="nav-badge" id="surgeryNavBadge" style="display:none">0</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="audittrail">
+        <i class="fa-solid fa-clock-rotate-left"></i><span>Audit Trail</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="liverequest">
+        <i class="fa-solid fa-hand-holding-droplet"></i><span>Live Request</span>
+        <span class="nav-badge" id="requestNavBadge" style="display:none">0</span>
+      </a></li>
+    </ul>
+
+    <span class="nav-section-label">Account</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item" href="#" data-section="settings">
+        <i class="fa-solid fa-gear"></i><span>Settings</span>
+      </a></li>
+    </ul>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName"></div>
+          <div class="sidebar-user-role" id="sidebarRole"></div>
+        </div>
+        <i class="fa-solid fa-arrow-right-from-bracket" id="sidebarLogoutBtn" style="color:var(--text-muted);font-size:13px;cursor:pointer;margin-left:auto;"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- ── TOP HEADER ─────────────────────────────────────── -->
+    <div class="top-header">
+      <div class="header-left">
+        <h1 id="headerTitle">Command Center 🏥</h1>
+        <p id="headerSubtitle">Loading…</p>
+      </div>
+      <div class="header-right">
+        <div class="topbar-alert" id="criticalAlert" style="display:none" data-section="liverequest">
+          <div class="blink-dot"></div>
+          <span id="criticalAlertText">Critical Requests</span>
+        </div>
+        <button class="theme-toggle-btn" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button class="notif-btn" id="hospNotifBtn" style="position:relative">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notif-dot" id="hospNotifDot" style="display:none"></span>
+          <span id="hospNotifCount" style="display:none;position:absolute;top:-4px;right:-4px;background:#e11d48;color:#fff;font-size:10px;font-weight:800;border-radius:99px;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px"></span>
+        </button>
+        <div id="hospNotifPanel" style="display:none;position:fixed;width:320px;max-height:440px;overflow-y:auto;background:var(--surface);border:1px solid var(--border-color);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.22);z-index:9999">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2">
+            <span style="font-size:13px;font-weight:800;color:var(--text-primary)"><i class="fa-solid fa-bell" style="color:var(--primary);margin-right:8px"></i>Notifications</span>
+            <button onclick="window.markAllHospNotifsRead()" style="font-size:11px;font-weight:700;color:var(--primary);background:none;border:none;cursor:pointer">Mark all read</button>
+          </div>
+          <div id="hospNotifList">
+            <div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">
+              <i class="fa-solid fa-bell-slash" style="display:block;margin-bottom:8px;font-size:22px;opacity:.4"></i>No new notifications
+            </div>
+          </div>
+        </div>
+        <div class="header-avatar-wrap" id="headerAvatarWrap">
+          <div id="headerAvatarPlaceholder" 
+              style="width:36px;height:36px;border-radius:50%;background:var(--border-color);animation:pulse 1.5s infinite">
+          </div>
+          <img id="headerAvatar" src="" alt="Avatar" class="header-avatar" style="display:none">
+        </div>
+        <!-- ✅ Dropdown is NOW outside headerAvatarWrap -->
+        <div class="header-profile-dropdown" id="headerDropdown">
+          <div class="hpd-header">
+            <img id="hdpAvatar" src="https://ui-avatars.com/api/?name=User&background=0d9488&color=fff&size=80" class="hpd-avatar">
+            <div>
+              <div class="hpd-name" id="hdpName"></div>
+              <div class="hpd-role">🏥 Hospital</div>
+            </div>
+          </div>
+          <div class="hpd-divider"></div>
+          <div class="hpd-item" id="changePhotoBtn">
+            <i class="fa-solid fa-camera"></i> Change Photo
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none">
+          </div>
+          <div class="hpd-item" onclick="document.getElementById('headerDropdown').classList.remove('open');switchSection('profile')">
+            <i class="fa-solid fa-user"></i> My Profile
+          </div>
+          <div class="hpd-item" onclick="document.getElementById('headerDropdown').classList.remove('open');switchSection('settings')">
+            <i class="fa-solid fa-gear"></i> Settings
+          </div>
+          <div class="hpd-divider"></div>
+          <div class="hpd-item hpd-logout" id="logoutBtn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 1 — COMMAND CENTER (Overview)
+    ══════════════════════════════════════════════════════════ -->
+    <section id="sec-commandcenter">
+      <!-- KPI Row -->
+      <div class="h-grid g-4 fade-up d1" style="margin-bottom:16px">
+        <div class="h-card">
+          <div class="h-card-label">Active Blood Requests</div>
+          <div class="h-card-value" id="kpiActiveReqs">—</div>
+          <div class="h-card-sub" id="kpiActiveReqsSub">Loading…</div>
+          <div class="h-card-icon" style="background:var(--blue-dim);color:var(--blue)"><i class="fa-solid fa-paper-plane"></i></div>
+          <div class="sparkline"><svg id="sp1" viewBox="0 0 100 36" preserveAspectRatio="none"></svg></div>
+        </div>
+        <div class="h-card">
+          <div class="h-card-label">Blood On Hand</div>
+          <div class="h-card-value" id="kpiBloodOnHand">—</div>
+          <div class="h-card-sub" id="kpiBloodOnHandSub">Total units in stock</div>
+          <div class="h-card-icon" style="background:var(--danger-dim);color:var(--danger)"><i class="fa-solid fa-droplet"></i></div>
+          <div class="sparkline"><svg id="sp2" viewBox="0 0 100 36" preserveAspectRatio="none"></svg></div>
+        </div>
+        <div class="h-card">
+          <div class="h-card-label">Surgeries This Week</div>
+          <div class="h-card-value" id="kpiSurgeries">—</div>
+          <div class="h-card-sub" id="kpiSurgeriesSub">Requiring blood</div>
+          <div class="h-card-icon" style="background:var(--purple-dim);color:var(--purple)"><i class="fa-solid fa-scalpel"></i></div>
+          <div class="sparkline"><svg id="sp3" viewBox="0 0 100 36" preserveAspectRatio="none"></svg></div>
+        </div>
+        <div class="h-card">
+          <div class="h-card-label">Dispatched Today</div>
+          <div class="h-card-value" id="kpiDispatched">—</div>
+          <div class="h-card-sub"><span class="chip chip-ok" id="kpiDispatchedSub">From blood banks</span></div>
+          <div class="h-card-icon" style="background:var(--ok-dim);color:var(--ok)"><i class="fa-solid fa-truck-medical"></i></div>
+          <div class="sparkline"><svg id="sp4" viewBox="0 0 100 36" preserveAspectRatio="none"></svg></div>
+        </div>
+      </div>
+
+      <!-- Alerts + Recent Activity -->
+      <div class="h-grid g-63 fade-up d2" style="margin-bottom:16px;align-items:start">
+        <div class="h-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:15px;font-weight:800;color:var(--text-primary)">Recent Activity</span>
+            <span class="chip chip-teal">Live</span>
+          </div>
+          <div id="recentActivityList">
+            <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading activity…</p></div>
+          </div>
+        </div>
+        <div class="h-card">
+          <div style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:16px">Critical Alerts</div>
+          <div id="criticalAlertsList">
+            <div class="loading-spinner" style="padding:24px 0"><i class="fa-solid fa-spinner fa-spin" style="font-size:18px"></i><p>Checking…</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blood Status Strip -->
+      <div class="h-card fade-up d3">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:15px;font-weight:800;color:var(--text-primary)">Blood Stock Overview</span>
+          <span class="chip chip-orange">Current Levels</span>
+          <button class="btn-ghost" style="margin-left:auto;font-size:12px;padding:7px 14px" data-section="bloodinventory">View Full Inventory</button>
+        </div>
+        <div class="inv-grid" id="inventoryOverviewGrid">
+          <div class="loading-spinner" style="grid-column:1/-1;padding:24px 0"><i class="fa-solid fa-spinner fa-spin" style="font-size:18px"></i><p>Loading stock…</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 2 — BLOOD INVENTORY
+    ══════════════════════════════════════════════════════════ -->
+    <section id="sec-bloodinventory" style="display:none">
+      <div class="sec-header fade-up d1">
+        <h2>Blood Inventory</h2>
+        <span class="sec-tag">Stock Levels</span>
+        <div style="margin-left:auto;display:flex;gap:10px">
+          <button class="btn-primary" id="requestBloodShortcut" data-section="liverequest">
+            <i class="fa-solid fa-plus"></i> Request Blood
+          </button>
+        </div>
+      </div>
+
+      <!-- 8 Blood Group Cards -->
+      <div class="h-card fade-up d2" style="margin-bottom:16px">
+        <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:16px">Current Stock by Blood Group</div>
+        <div class="inv-grid" id="inventoryFullGrid">
+          <div class="loading-spinner" style="grid-column:1/-1"><i class="fa-solid fa-spinner fa-spin"></i><p>Fetching inventory…</p></div>
+        </div>
+      </div>
+
+      <!-- Recent Receipts -->
+      <div class="h-card fade-up d3">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:14px;font-weight:800;color:var(--text-primary)">Recent Receipts</span>
+          <span class="chip chip-teal">From Blood Banks</span>
+        </div>
+        <div id="receiptsList">
+          <div class="empty-state"><i class="fa-solid fa-inbox"></i><h3>No receipts yet</h3><p>Blood dispatched by blood banks will appear here.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 3 — DONOR MATCH
+    ══════════════════════════════════════════════════════════ -->
+    <section id="sec-donormatch" style="display:none">
+      <div class="sec-header fade-up d1">
+        <h2>Donor Match</h2>
+        <span class="sec-tag">Verified Pool</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+          <input id="donorSearchInput" type="text" placeholder="Search donors…" style="background:var(--surface);border:1px solid var(--border-color);border-radius:8px;padding:8px 14px;font-size:13px;font-family:inherit;color:var(--text-primary);outline:none;width:200px"/>
+        </div>
+      </div>
+
+      <!-- Blood Group Filter -->
+      <div class="h-card fade-up d2" style="margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:12px">Filter by Blood Group</div>
+        <div class="bg-filter-row">
+          <button class="bg-filter-btn all-btn active" data-bg="all">All Groups</button>
+          <button class="bg-filter-btn" data-bg="A+">A+</button>
+          <button class="bg-filter-btn" data-bg="A-">A−</button>
+          <button class="bg-filter-btn" data-bg="B+">B+</button>
+          <button class="bg-filter-btn" data-bg="B-">B−</button>
+          <button class="bg-filter-btn" data-bg="AB+">AB+</button>
+          <button class="bg-filter-btn" data-bg="AB-">AB−</button>
+          <button class="bg-filter-btn" data-bg="O+">O+</button>
+          <button class="bg-filter-btn" data-bg="O-">O−</button>
+        </div>
+      </div>
+
+      <!-- Donor Table + Map -->
+      <div class="h-grid g-63 fade-up d3" style="align-items:start">
+        <div class="h-card">
+          <div id="donorListWrap">
+            <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading donors…</p></div>
+          </div>
+        </div>
+        <div class="h-card">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:12px">Donor Locations</div>
+          <div id="donorMap"></div>
+          <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)"><span style="width:10px;height:10px;border-radius:50%;background:#0d9488;display:inline-block"></span>Eligible</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span>Cooling Down</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 4 — SURGERY SCHEDULE
+    ══════════════════════════════════════════════════════════ -->
+    <section id="sec-surgeryschedule" style="display:none">
+      <div class="sec-header fade-up d1">
+        <h2>Surgery Schedule</h2>
+        <span class="sec-tag" id="surgeryCountTag">Loading</span>
+        <button class="btn-primary" style="margin-left:auto" id="openSurgeryModalBtn">
+          <i class="fa-solid fa-plus"></i> Add Surgery
+        </button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="h-grid g-4 fade-up d2" style="margin-bottom:16px">
+        <div class="h-card"><div class="h-card-label">Upcoming</div><div class="h-card-value" id="surgKpiUpcoming">—</div><div class="h-card-sub">This week</div></div>
+        <div class="h-card"><div class="h-card-label">Blood Required</div><div class="h-card-value" id="surgKpiUnitsNeeded" style="color:var(--danger)">—</div><div class="h-card-sub">Total units needed</div></div>
+        <div class="h-card"><div class="h-card-label">Covered</div><div class="h-card-value" id="surgKpiCovered" style="color:var(--ok)">—</div><div class="h-card-sub">Surgeries with stock</div></div>
+        <div class="h-card"><div class="h-card-label">Pending Coverage</div><div class="h-card-value" id="surgKpiPending" style="color:var(--warn)">—</div><div class="h-card-sub">Need blood request</div></div>
+      </div>
+
+      <!-- Surgery Table -->
+      <div class="h-card fade-up d3">
+        <div id="surgeryTableWrap" style="display:none">
+          <table class="h-table" id="surgeryTable">
+            <thead><tr>
+              <th>Surgery</th><th>Date &amp; Time</th><th>Surgeon</th>
+              <th>Blood Group</th><th>Units</th><th>Status</th><th>Action</th>
+            </tr></thead>
+            <tbody id="surgeryTableBody"></tbody>
+          </table>
+        </div>
+        <div id="surgeryEmpty" class="empty-state">
+          <i class="fa-solid fa-calendar-xmark"></i>
+          <h3>No surgeries scheduled</h3>
+          <p>Add an upcoming surgery to track its blood requirements.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 5 — AUDIT TRAIL
+    ══════════════════════════════════════════════════════════ -->
+    <section id="sec-audittrail" style="display:none">
+      <div class="sec-header fade-up d1">
+        <h2>Audit Trail</h2>
+        <span class="sec-tag">Activity Log</span>
+        <div style="margin-left:auto;display:flex;gap:10px">
+          <select id="auditFilterType" style="background:var(--surface);border:1px solid var(--border-color);border-radius:8px;padding:7px 12px;font-size:12px;font-family:inherit;color:var(--text-secondary);outline:none">
+            <option value="all">All Types</option>
+            <option value="request">Blood Requests</option>
+            <option value="surgery">Surgeries</option>
+            <option value="inventory">Inventory</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="h-card fade-up d2">
+        <div id="auditTrailList">
+          <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading audit trail…</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SECTION 6 — LIVE REQUEST
+    ══════════════════════════════════════════════════════════ -->
+    <section id="sec-liverequest" style="display:none">
+      <div class="sec-header fade-up d1">
+        <h2>Live Blood Requests</h2>
+        <span class="sec-tag" id="liveReqTag">Live</span>
+        <button class="btn-primary" style="margin-left:auto" id="openRequestModalBtn">
+          <i class="fa-solid fa-plus"></i> New Request
+        </button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="h-grid g-4 fade-up d2" style="margin-bottom:16px">
+        <div class="h-card"><div class="h-card-label">Open</div><div class="h-card-value" id="reqKpiOpen" style="color:var(--blue)">—</div><div class="h-card-sub">Awaiting blood bank</div></div>
+        <div class="h-card"><div class="h-card-label">Acknowledged</div><div class="h-card-value" id="reqKpiAck" style="color:var(--orange)">—</div><div class="h-card-sub">Blood bank accepted</div></div>
+        <div class="h-card"><div class="h-card-label">In Progress</div><div class="h-card-value" id="reqKpiInProg" style="color:var(--purple)">—</div><div class="h-card-sub">Being prepared</div></div>
+        <div class="h-card"><div class="h-card-label">Dispatched</div><div class="h-card-value" id="reqKpiDispatched" style="color:var(--primary)">—</div><div class="h-card-sub">En route to hospital</div></div>
+      </div>
+
+      <!-- Requests Table -->
+      <div class="h-card fade-up d3">
+        <div id="requestsLoading" class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i><p>Listening for requests…</p></div>
+        <div id="requestsTableWrap" style="display:none">
+          <table class="h-table" id="requestsTable">
+            <thead><tr>
+              <th>Blood Group</th><th>Units</th><th>Urgency</th><th>Patient Info</th>
+              <th>Status</th><th>Blood Bank</th><th>Created</th><th>Action</th>
+            </tr></thead>
+            <tbody id="requestsTableBody"></tbody>
+          </table>
+        </div>
+        <div id="requestsEmpty" class="empty-state" style="display:none">
+          <i class="fa-solid fa-hand-holding-droplet"></i>
+          <h3>No blood requests yet</h3>
+          <p>Create a new request to notify nearby blood banks.</p>
+          <button class="btn-primary" style="margin-top:16px" id="emptyStateNewReqBtn"><i class="fa-solid fa-plus"></i> New Request</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: PROFILE ════════════════════════════ -->
+    <section id="sec-profile" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Profile</h2><span class="sec-tag">Account</span></div>
+      <div class="d-card fade-up d2" style="max-width:600px">
+        <div class="profile-header">
+          <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=0d9488&color=fff&size=160" style="width:72px;height:72px;border-radius:50%;flex-shrink:0" onclick="document.getElementById('profilePhotoInput').click()"/>
+          <div>
+            <div style="font-size:18px;font-weight:800;color:var(--text-primary)" id="profileName"></div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:3px" id="profileBloodGroup"></div>
+            <span class="chip chip-teal" style="margin-top:8px"><i class="fa-solid fa-heart-pulse"></i> Hospital</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Full Name</label>
+            <input type="text" id="profileNameInput" value=""/>
+          </div>
+          <div class="form-field">
+            <label>Age</label>
+            <input type="number"id="profileAgeInput" value=""/>
+          </div>
+        </div>
+        <div class="form-row"><div class="form-field"><label>Blood Group</label><select id="profileBloodGroupInput"><option>O+</option><option>O−</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option></select></div><div class="form-field"><label>Phone</label><input type="tel" value="" id="profilePhoneInput"/></div></div>
+        <div class="form-row full"><div class="form-field"><label>Email</label><input type="email" value=""  id="profileEmailInput"/></div></div>
+        <div style="margin-top:16px;display:flex;gap:10px">
+          <button class="btn-primary" id="saveProfileBtn" onclick="saveProfileChanges()"><i class="fa-solid fa-check"></i> Save Changes</button>
+          <button class="btn-ghost" onclick="loadProfileFromData()">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         SETTINGS
+    ══════════════════════════════════════════════════════════ -->
+    <section id="sec-settings" style="display:none">
+      <div class="sec-header fade-up d1"><h2>Settings</h2><span class="sec-tag">Preferences</span></div>
+      <div class="h-card fade-up d2" style="max-width:600px">
+        <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:16px">Notifications</p>
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:20px;border-bottom:1px solid var(--border-color);margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:700;color:var(--text-primary)">Critical blood request alerts</div><div style="font-size:12px;color:var(--text-muted)">When your request is accepted or dispatched</div></div>
+            <div style="width:40px;height:22px;background:var(--primary);border-radius:99px;cursor:pointer;position:relative"><div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;right:2px"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:700;color:var(--text-primary)">Low stock warnings</div><div style="font-size:12px;color:var(--text-muted)">When blood group drops below minimum threshold</div></div>
+            <div style="width:40px;height:22px;background:var(--primary);border-radius:99px;cursor:pointer;position:relative"><div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;right:2px"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:700;color:var(--text-primary)">Surgery blood coverage alerts</div><div style="font-size:12px;color:var(--text-muted)">When an upcoming surgery is missing blood coverage</div></div>
+            <div style="width:40px;height:22px;background:var(--border-color);border-radius:99px;cursor:pointer;position:relative"><div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;left:2px"></div></div>
+          </div>
+        </div>
+        <button class="btn-primary" id="themeToggleSettings"><i class="fa-solid fa-circle-half-stroke"></i> Toggle Dark Mode</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL — NEW BLOOD REQUEST
+═══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="bloodRequestModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-hand-holding-droplet" style="color:var(--danger);margin-right:8px"></i>New Blood Request</div>
+      <button class="modal-close" id="closeRequestModalBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px">
+        <i class="fa-solid fa-droplet" style="margin-right:6px;color:var(--danger)"></i>Blood Requirement
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Units Needed *</label>
+          <input type="number" id="reqUnits" min="1" placeholder="e.g. 3"/>
+        </div>
+        <div class="form-field">
+          <label>Urgency *</label>
+          <select id="reqUrgency">
+            <option value="">Select urgency…</option>
+            <option value="critical">🔴 Critical (≤ 4 hrs)</option>
+            <option value="urgent">🟡 Urgent (≤ 12 hrs)</option>
+            <option value="routine">🟢 Routine (≤ 48 hrs)</option>
+          </select>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Blood Group *</div>
+      <div class="bg-picker" id="reqBgPicker" style="margin-bottom:16px">
+        <button class="bg-btn" data-bg="A+">A+</button>
+        <button class="bg-btn" data-bg="A-">A−</button>
+        <button class="bg-btn" data-bg="B+">B+</button>
+        <button class="bg-btn" data-bg="B-">B−</button>
+        <button class="bg-btn" data-bg="AB+">AB+</button>
+        <button class="bg-btn" data-bg="AB-">AB−</button>
+        <button class="bg-btn" data-bg="O+">O+</button>
+        <button class="bg-btn" data-bg="O-">O−</button>
+      </div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px">
+        <i class="fa-solid fa-user" style="margin-right:6px;color:var(--primary)"></i>Patient Details (Optional)
+      </div>
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Patient Name / Ward</label>
+          <input type="text" id="reqPatientInfo" placeholder="e.g. ICU Bed 4 — Rohit Mehta"/>
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Notes</label>
+          <textarea id="reqNotes" placeholder="Any additional details for the blood bank…"></textarea>
+        </div>
+      </div>
+      <div id="reqExpiryCopy" style="display:none;background:var(--orange-dim);border:1px solid rgba(249,115,22,.25);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--orange);font-weight:600;margin-top:4px">
+        <i class="fa-solid fa-clock" style="margin-right:6px"></i><span id="reqExpiryText"></span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" id="cancelRequestModalBtn">Cancel</button>
+      <button class="btn-primary" id="submitRequestBtn">
+        <i class="fa-solid fa-paper-plane"></i> Send Request
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL — ADD SURGERY
+═══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="surgeryModalOverlay">
+  <div class="modal" style="width:580px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-scalpel" style="color:var(--purple);margin-right:8px"></i>Add Surgery</div>
+      <button class="modal-close" id="closeSurgeryModalBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Surgery Name *</label><input type="text" id="surgName" placeholder="e.g. Open Heart Surgery"/></div>
+        <div class="form-field"><label>Surgeon Name</label><input type="text" id="surgSurgeon" placeholder="Dr. Name"/></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Date *</label><input type="date" id="surgDate"/></div>
+        <div class="form-field"><label>Time *</label><input type="time" id="surgTime" value="09:00"/></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Units Required *</label><input type="number" id="surgUnits" min="1" placeholder="e.g. 4"/></div>
+        <div class="form-field"><label>Ward / OT</label><input type="text" id="surgWard" placeholder="e.g. OT-3"/></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">Blood Group Required *</div>
+      <div class="bg-picker" id="surgBgPicker" style="margin-bottom:14px">
+        <button class="bg-btn" data-bg="A+">A+</button>
+        <button class="bg-btn" data-bg="A-">A−</button>
+        <button class="bg-btn" data-bg="B+">B+</button>
+        <button class="bg-btn" data-bg="B-">B−</button>
+        <button class="bg-btn" data-bg="AB+">AB+</button>
+        <button class="bg-btn" data-bg="AB-">AB−</button>
+        <button class="bg-btn" data-bg="O+">O+</button>
+        <button class="bg-btn" data-bg="O-">O−</button>
+      </div>
+      <div class="form-grid full"><div class="form-field"><label>Notes</label><textarea id="surgNotes" placeholder="Pre-op requirements, special instructions…"></textarea></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" id="cancelSurgeryBtn">Cancel</button>
+      <button class="btn-primary" id="submitSurgeryBtn"><i class="fa-solid fa-check"></i> Save Surgery</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done!</span></div>
+
+<script type="module" src="../js/hospital.js"></script>
+</body>
+</html>

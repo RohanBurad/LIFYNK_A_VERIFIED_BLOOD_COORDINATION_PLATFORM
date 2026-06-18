@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Lifynk</title>
+  <link rel="icon" href="../assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/dashboard-shared.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-shell">
+
+  <!-- ═══════════ SIDEBAR ══════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="../assets/favicon.png" alt="Lifynk">
+      <span class="sidebar-brand-name">Lif<span>ynk</span></span>
+    </div>
+    <div class="role-badge">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span class="role-badge-text">Admin</span>
+    </div>
+
+    <span class="nav-section-label">Dashboard</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item active" href="#" data-section="overview">
+        <i class="fa-solid fa-border-all"></i><span>Overview</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="analytics">
+        <i class="fa-solid fa-chart-line"></i><span>Analytics</span>
+      </a></li>
+    </ul>
+
+    <span class="nav-section-label">Management</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item" href="#" data-section="orgs">
+        <i class="fa-solid fa-building"></i><span>Organisations</span>
+        <span class="nav-badge" id="orgPendingBadge" style="display:none">0</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="donors">
+        <i class="fa-solid fa-droplet"></i><span>Donors</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="recipients">
+        <i class="fa-solid fa-user-injured"></i><span>Recipients</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="requests">
+        <i class="fa-solid fa-hand-holding-medical"></i><span>Blood Requests</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="reports">
+        <i class="fa-solid fa-flag"></i><span>Reports</span>
+        <span class="nav-badge" id="reportsBadge" style="display:none">0</span>
+      </a></li>
+    </ul>
+
+    <span class="nav-section-label">Tools</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item" href="#" data-section="broadcast">
+        <i class="fa-solid fa-bullhorn"></i><span>Broadcast</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="audit">
+        <i class="fa-solid fa-scroll"></i><span>Audit Log</span>
+      </a></li>
+    </ul>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user" id="sidebarUserWrap">
+        <div class="sidebar-avatar-wrap">
+          <img class="sidebar-avatar" id="sidebarAvatar"
+               src="https://ui-avatars.com/api/?name=Admin&background=0d9488&color=fff" alt="Admin">
+        </div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName">Admin</div>
+          <div class="sidebar-user-role">Super Admin</div>
+        </div>
+        <i class="fa-solid fa-arrow-right-from-bracket" id="sidebarLogoutBtn"
+           style="color:var(--text-muted);font-size:13px;cursor:pointer;margin-left:auto;flex-shrink:0"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ════════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+      <div class="header-left">
+        <h1 id="pageTitle">Command Centre 🛡️</h1>
+        <p id="pageSubtitle">Welcome back — here's your platform at a glance</p>
+      </div>
+      <div class="header-right">
+        <button class="theme-toggle-btn" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button class="notif-btn" id="notifBtn">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notif-dot" id="notifDot" style="display:none"></span>
+        </button>
+        <div class="header-avatar-wrap" id="headerAvatarWrap">
+          <img id="headerAvatar"
+               src="https://ui-avatars.com/api/?name=Admin&background=0d9488&color=fff"
+               alt="Admin" class="header-avatar">
+        </div>
+        <div class="header-profile-dropdown" id="headerDropdown">
+          <div class="hpd-header">
+            <img id="hdpAvatar"
+                 src="https://ui-avatars.com/api/?name=Admin&background=0d9488&color=fff"
+                 class="hpd-avatar">
+            <div>
+              <div class="hpd-name" id="hdpName">Admin</div>
+              <div class="hpd-role">🛡️ Super Admin</div>
+            </div>
+          </div>
+          <div class="hpd-divider"></div>
+          <div class="hpd-item hpd-logout" id="logoutBtn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SECTION: OVERVIEW ═══════════════════════════ -->
+    <section id="sec-overview" class="active">
+
+      <div class="d-grid g-4 fade-up d1" style="margin-bottom:16px">
+        <div class="d-card">
+          <div class="d-card-icon" style="background:rgba(13,148,136,.1);color:var(--primary)"><i class="fa-solid fa-users"></i></div>
+          <div class="d-card-label">Total Users</div>
+          <div class="d-card-value" id="kpiTotalUsers">—</div>
+          <div class="d-card-sub">Donors + Recipients</div>
+          <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Platform total</div>
+        </div>
+        <div class="d-card">
+          <div class="d-card-icon" style="background:var(--ok-dim);color:var(--ok)"><i class="fa-solid fa-droplet"></i></div>
+          <div class="d-card-label">Total Donations</div>
+          <div class="d-card-value" id="kpiTotalDonations">—</div>
+          <div class="d-card-sub">All time</div>
+          <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Lifetime</div>
+        </div>
+        <div class="d-card">
+          <div class="d-card-icon" style="background:var(--warn-dim);color:var(--warn)"><i class="fa-solid fa-building"></i></div>
+          <div class="d-card-label">Organisations</div>
+          <div class="d-card-value" id="kpiTotalOrgs">—</div>
+          <div class="d-card-sub">Hospitals, NGOs, Blood Banks</div>
+          <div class="stat-trend" id="kpiOrgPendingTrend"><i class="fa-solid fa-clock"></i> Loading…</div>
+        </div>
+        <div class="d-card">
+          <div class="d-card-icon" style="background:var(--danger-dim);color:var(--danger)"><i class="fa-solid fa-flag"></i></div>
+          <div class="d-card-label">Open Reports</div>
+          <div class="d-card-value" id="kpiOpenReports">—</div>
+          <div class="d-card-sub">Needs review</div>
+          <div class="stat-trend down" id="kpiReportTrend"><i class="fa-solid fa-triangle-exclamation"></i> Action needed</div>
+        </div>
+      </div>
+
+      <div class="d-grid g-2 fade-up d2" style="margin-bottom:16px;align-items:start">
+
+        <!-- Pending Org Approvals -->
+        <div class="d-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:15px;font-weight:800;color:var(--text-primary)">Pending Approvals</span>
+            <span class="chip chip-warn" id="pendingApprovalChip">0</span>
+            <a href="#" class="card-action" style="margin-left:auto;font-size:12px" onclick="switchSection('orgs')">View all</a>
+          </div>
+          <div id="overviewPendingList">
+            <div class="empty-state"><i class="fa-solid fa-circle-check"></i>All caught up!</div>
+          </div>
+        </div>
+
+        <!-- Recent Audit Log -->
+        <div class="d-card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:15px;font-weight:800;color:var(--text-primary)">Recent Activity</span>
+            <a href="#" class="card-action" style="margin-left:auto;font-size:12px" onclick="switchSection('audit')">View all</a>
+          </div>
+          <div id="overviewAuditList">
+            <div class="empty-state"><i class="fa-solid fa-scroll"></i>No activity yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="sec-header fade-up d3"><h2>Quick Actions</h2></div>
+      <div class="d-grid g-4 fade-up d3" style="margin-bottom:16px">
+        <button class="d-card" style="cursor:pointer;text-align:left;border:none" onclick="switchSection('orgs')">
+          <div class="d-card-icon" style="background:var(--warn-dim);color:var(--warn)"><i class="fa-solid fa-building-circle-check"></i></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-top:44px">Review Orgs</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Approve or reject pending</div>
+        </button>
+        <button class="d-card" style="cursor:pointer;text-align:left;border:none" onclick="switchSection('broadcast')">
+          <div class="d-card-icon" style="background:var(--primary-soft);color:var(--primary)"><i class="fa-solid fa-bullhorn"></i></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-top:44px">Send Broadcast</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Announce to all users</div>
+        </button>
+        <button class="d-card" style="cursor:pointer;text-align:left;border:none" onclick="exportCSV('users')">
+          <div class="d-card-icon" style="background:var(--ok-dim);color:var(--ok)"><i class="fa-solid fa-file-csv"></i></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-top:44px">Export Users CSV</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Download all user data</div>
+        </button>
+        <button class="d-card" style="cursor:pointer;text-align:left;border:none" onclick="switchSection('reports')">
+          <div class="d-card-icon" style="background:var(--danger-dim);color:var(--danger)"><i class="fa-solid fa-flag"></i></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-top:44px">Review Reports</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Handle flagged content</div>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ══════════ SECTION: ANALYTICS ══════════════════════════ -->
+    <section id="sec-analytics">
+      <div class="sec-header fade-up d1"><h2>Analytics</h2><span class="sec-tag">Platform Stats</span>
+        <button class="btn-ghost" style="margin-left:auto;font-size:12px" onclick="exportCSV('analytics')">
+          <i class="fa-solid fa-download"></i> Export
+        </button>
+      </div>
+
+      <div class="d-grid g-2 fade-up d2" style="margin-bottom:16px;align-items:start">
+
+        <!-- Registrations by role -->
+        <div class="d-card">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:16px">Users by Role</div>
+          <div id="analyticsRoleChart"></div>
+        </div>
+
+        <!-- Blood group distribution -->
+        <div class="d-card">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:16px">Blood Group Distribution</div>
+          <div id="analyticsBloodChart"></div>
+        </div>
+      </div>
+
+      <div class="d-grid g-2 fade-up d3" style="align-items:start">
+        <!-- Org breakdown -->
+        <div class="d-card">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:16px">Organisations by Type</div>
+          <div id="analyticsOrgChart"></div>
+        </div>
+        <!-- Donation activity -->
+        <div class="d-card">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:16px">Platform Summary</div>
+          <div id="analyticsSummary"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: ORGANISATIONS ══════════════════════ -->
+    <section id="sec-orgs">
+      <div class="sec-header fade-up d1">
+        <h2>Organisations</h2>
+        <span class="sec-tag" id="orgSectionTag">All</span>
+        <button class="btn-export" style="margin-left:auto" onclick="exportCSV('orgs')">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+      <div class="filter-tabs fade-up d1">
+        <button class="ftab active" data-filter="all">All</button>
+        <button class="ftab" data-filter="pending">Pending</button>
+        <button class="ftab" data-filter="approved">Approved</button>
+        <button class="ftab" data-filter="rejected">Rejected</button>
+        <button class="ftab" data-filter="suspended">Suspended</button>
+        <button class="ftab" data-filter="hospital">Hospitals</button>
+        <button class="ftab" data-filter="ngo">NGOs</button>
+        <button class="ftab" data-filter="bloodbank">Blood Banks</button>
+      </div>
+      <div class="d-card fade-up d2">
+        <div id="orgList">
+          <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading…</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: DONORS ══════════════════════════════ -->
+    <section id="sec-donors">
+      <div class="sec-header fade-up d1">
+        <h2>Donors</h2><span class="sec-tag" id="donorSectionTag">All</span>
+        <button class="btn-export" style="margin-left:auto" onclick="exportCSV('donors')">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+      <div class="filter-tabs fade-up d1">
+        <button class="ftab active" data-filter="all">All</button>
+        <button class="ftab" data-filter="active">Active</button>
+        <button class="ftab" data-filter="suspended">Suspended</button>
+        <button class="ftab" data-filter="banned">Banned</button>
+      </div>
+      <div class="d-card fade-up d2">
+        <div id="donorList">
+          <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading…</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: RECIPIENTS ═════════════════════════ -->
+    <section id="sec-recipients">
+      <div class="sec-header fade-up d1">
+        <h2>Recipients</h2><span class="sec-tag" id="recipientSectionTag">All</span>
+        <button class="btn-export" style="margin-left:auto" onclick="exportCSV('recipients')">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+      <div class="filter-tabs fade-up d1">
+        <button class="ftab active" data-filter="all">All</button>
+        <button class="ftab" data-filter="active">Active</button>
+        <button class="ftab" data-filter="suspended">Suspended</button>
+        <button class="ftab" data-filter="banned">Banned</button>
+      </div>
+      <div class="d-card fade-up d2">
+        <div id="recipientList">
+          <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading…</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: BLOOD REQUESTS ═════════════════════ -->
+    <section id="sec-requests">
+      <div class="sec-header fade-up d1">
+        <h2>Blood Requests</h2><span class="sec-tag">Live</span>
+        <button class="btn-export" style="margin-left:auto" onclick="exportCSV('requests')">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+      <div class="filter-tabs fade-up d1">
+        <button class="ftab active" data-filter="all">All</button>
+        <button class="ftab" data-filter="open">Open</button>
+        <button class="ftab" data-filter="fulfilled">Fulfilled</button>
+        <button class="ftab" data-filter="expired">Expired</button>
+      </div>
+      <div class="d-card fade-up d2">
+        <div id="requestList">
+          <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading…</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: REPORTS ═════════════════════════════ -->
+    <section id="sec-reports">
+      <div class="sec-header fade-up d1">
+        <h2>User Reports</h2><span class="sec-tag danger" id="reportSectionTag">Open</span>
+      </div>
+      <div class="filter-tabs fade-up d1">
+        <button class="ftab active" data-filter="open">Open</button>
+        <button class="ftab" data-filter="resolved">Resolved</button>
+        <button class="ftab" data-filter="dismissed">Dismissed</button>
+      </div>
+      <div class="d-card fade-up d2">
+        <div id="reportList">
+          <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading…</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: BROADCAST ══════════════════════════ -->
+    <section id="sec-broadcast">
+      <div class="sec-header fade-up d1"><h2>Broadcast</h2><span class="sec-tag">Announcements</span></div>
+
+      <div class="d-grid g-2 fade-up d2" style="align-items:start">
+
+        <!-- Compose -->
+        <div class="d-card">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:16px">
+            <i class="fa-solid fa-pen-to-square" style="color:var(--primary);margin-right:8px"></i>Compose Message
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="form-field">
+              <label>Title</label>
+              <input type="text" id="bcTitle" placeholder="e.g. Emergency Blood Drive in Ahmedabad">
+            </div>
+            <div class="form-field">
+              <label>Message</label>
+              <textarea id="bcMessage" placeholder="Type your announcement here…"></textarea>
+            </div>
+            <div class="form-field">
+              <label>Target Audience</label>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px" id="bcTargets">
+                <span class="target-chip checked" data-target="donors"><i class="fa-solid fa-droplet"></i> Donors</span>
+                <span class="target-chip checked" data-target="recipients"><i class="fa-solid fa-user-injured"></i> Recipients</span>
+                <span class="target-chip checked" data-target="hospitals"><i class="fa-solid fa-hospital"></i> Hospitals</span>
+                <span class="target-chip checked" data-target="ngos"><i class="fa-solid fa-hand-holding-heart"></i> NGOs</span>
+                <span class="target-chip checked" data-target="bloodbanks"><i class="fa-solid fa-flask-vial"></i> Blood Banks</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>Priority</label>
+              <select id="bcPriority">
+                <option value="normal">Normal</option>
+                <option value="important">Important</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="sendBroadcast()" style="align-self:flex-start">
+              <i class="fa-solid fa-paper-plane"></i> Send Broadcast
+            </button>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="d-card">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:16px">
+            <i class="fa-solid fa-clock-rotate-left" style="color:var(--text-muted);margin-right:8px"></i>Broadcast History
+          </div>
+          <div id="broadcastHistory">
+            <div class="empty-state"><i class="fa-solid fa-bullhorn"></i>No broadcasts yet</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SECTION: AUDIT LOG ═══════════════════════════ -->
+    <section id="sec-audit">
+      <div class="sec-header fade-up d1">
+        <h2>Audit Log</h2><span class="sec-tag">Admin Actions</span>
+        <button class="btn-export" style="margin-left:auto" onclick="exportCSV('audit')">
+          <i class="fa-solid fa-file-csv"></i> Export
+        </button>
+      </div>
+      <div class="d-card fade-up d2">
+        <div id="auditLog">
+          <div class="empty-state"><i class="fa-solid fa-scroll"></i>No actions logged yet</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ══════════ MODAL: ORG DETAIL ══════════════════════════════ -->
+<div class="modal-overlay" id="orgModalOverlay" onclick="if(event.target===this)closeModal('orgModal')">
+  <div class="modal" id="orgModal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-building" style="color:var(--primary)"></i><span id="orgModalTitle">Organisation</span></div>
+      <button class="modal-close" onclick="closeModal('orgModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="orgModalBody"></div>
+    <div class="modal-footer" id="orgModalFooter"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: USER DETAIL ═════════════════════════════ -->
+<div class="modal-overlay" id="userModalOverlay" onclick="if(event.target===this)closeModal('userModal')">
+  <div class="modal" id="userModal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-user" style="color:var(--primary)"></i><span id="userModalTitle">User</span></div>
+      <button class="modal-close" onclick="closeModal('userModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="userModalBody"></div>
+    <div class="modal-footer" id="userModalFooter"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: REPORT DETAIL ═══════════════════════════ -->
+<div class="modal-overlay" id="reportModalOverlay" onclick="if(event.target===this)closeModal('reportModal')">
+  <div class="modal" id="reportModal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-flag" style="color:var(--danger)"></i><span>Report Detail</span></div>
+      <button class="modal-close" onclick="closeModal('reportModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="reportModalBody"></div>
+    <div class="modal-footer" id="reportModalFooter"></div>
+  </div>
+</div>
+
+<!-- ══════════ LOGOUT CONFIRM ══════════════════════════════════ -->
+<div class="modal-overlay" id="logoutConfirmOverlay" onclick="if(event.target===this)closeLogoutModal()">
+  <div class="modal" style="width:380px;text-align:center">
+    <div class="modal-body" style="padding:36px 32px 28px">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--danger-dim);display:grid;place-items:center;margin:0 auto 20px">
+        <i class="fa-solid fa-arrow-right-from-bracket" style="font-size:26px;color:var(--danger)"></i>
+      </div>
+      <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:8px">Log out of Admin?</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:28px">You'll be returned to the login screen.</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn-primary" onclick="confirmLogout()" style="background:var(--danger);box-shadow:0 4px 16px rgba(225,29,72,.3);justify-content:center;width:100%;padding:13px">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Yes, Log Me Out
+        </button>
+        <button class="btn-ghost" onclick="closeLogoutModal()" style="width:100%;justify-content:center;padding:13px">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Panel -->
+<div id="notifPanel">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2">
+    <span style="font-size:13px;font-weight:800;color:var(--text-primary)"><i class="fa-solid fa-bell" style="color:var(--primary);margin-right:8px"></i>Notifications</span>
+  </div>
+  <div id="notifList">
+    <div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">
+      <i class="fa-solid fa-bell-slash" style="display:block;margin-bottom:8px;font-size:22px;opacity:.4"></i>No new notifications
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="../js/admin.js"></script>
+</body>
+</html>

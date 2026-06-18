@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Our Collaborators | Lifynk</title>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link href="../assets/favicon.png" rel="icon">
+        <link rel="stylesheet" href="../css/colab.css">
+        <script>
+            window.onbeforeunload = function () {
+                window.scrollTo(0, 0);
+            }
+        </script>
+    </head>
+    <body>
+        
+        <nav class="navbar">
+            <div class="logo">
+                <img src="../assets/logo.png" alt="Lifynk">
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="work.html">Our Working</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="colab.html"class="active">Our Collaborators</a></li>
+            </ul>
+            
+            <a href="../auth/login.html" class="btn-login">Login</a>
+        </nav>
+
+        <header class="work-hero">
+            <div class="container reveal">
+                <span class="hero-subtitle">Ecosystem of Hope</span>
+                <h1 class="hero-title">Partners in <span class="highlight-text">Saving Lives</span></h1>
+                <p class="hero-description">
+                    Lifynk thrives on collaboration. We bridge the gap by integrating with 
+                    top-tier medical institutions, verified NGOs, and dedicated blood banks 
+                    to create a seamless, real-time life-saving network.
+                </p>
+            </div>
+        </header>
+
+        <section class="partners-section">
+            <div class="container">
+                <div class="filter-container reveal">
+                    <button class="filter-btn active" data-filter="all">All Partners</button>
+                    <button class="filter-btn" data-filter="hospital">Hospitals</button>
+                    <button class="filter-btn" data-filter="ngo">NGOs</button>
+                    <button class="filter-btn" data-filter="govt">Government</button>
+                    <button class="filter-btn" data-filter="bloodbank">Blood Bank</button>
+                </div>
+
+                <div class="partners-grid">
+                    <div class="partner-card reveal hospital" data-category="hospital">
+                        <div class="card-badge">hospital</div>
+                        <div class="partner-icon"><i class="fa-solid fa-hospital"></i></div>
+                        <h3>City Civil Hospital</h3>
+                        <p>Ahmedabad, Gujarat</p>
+                        <span class="partner-type">Emergency Partner</span>
+                    </div>
+
+                    <div class="partner-card reveal delay-2 govt" data-category="govt">
+                        <div class="card-badge govt-badge">Govt.</div>
+                        <div class="partner-icon icon-govt"><i class="fa-solid fa-building-columns"></i></div>
+                        <h3>SBT Council</h3>
+                        <p>State Regulatory Body</p>
+                        <span class="partner-type">Compliance</span>
+                    </div>
+
+                    <div class="partner-card reveal delay-1 ngo" data-category="ngo">
+                        <div class="card-badge ngo-badge">ngo</div>
+                        <div class="partner-icon icon-ngo"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                        <h3>Pratham Education Foundation</h3>
+                        <p>National Network</p>
+                        <span class="partner-type">Helps in Camps and Donor Pool</span>
+                    </div>
+                    
+                    <div class="partner-card reveal delay-2 bloodbank" data-category="bloodbank">
+                        <div class="card-badge govt-badge">Blood Bank</div>
+                        <div class="partner-icon icon-govt"><i class="fa-solid fa-vials"></i></div>
+                        <h3>Red Cross</h3>
+                        <p>Donor Verification Gate</p>
+                        <span class="partner-type">Medical Screenings & Resume</span>
+                    </div>
+                
+                </div>
+            </div>
+        </section>
+
+        <section class="compliance-section reveal">
+            <div class="container">
+                <div class="compliance-grid">
+                    <div class="comp-item"><i class="fa-solid fa-certificate"></i><span>NABH ACCREDITED</span></div>
+                    <div class="comp-item"><i class="fa-solid fa-shield-check"></i><span>CDSCO COMPLIANT</span></div>
+                    <div class="comp-item"><i class="fa-solid fa-landmark"></i><span>GOVT. AUTHORIZED</span></div>
+                </div>
+            </div>
+        </section>
+
+        <footer style="background: var(--primary-dark); color: white; padding: 60px 0 30px; overflow: hidden;">
+            <div class="container">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px;">
+                    <div class="reveal">
+                        <h3 style="color: var(--white); margin-bottom: 20px;">Lifynk</h3>
+                        <p style="font-size: 0.9rem; color: #94a3b8;">A Smart HealthCare initiative by Silver Oak University students.</p>
+                    </div>
+                    
+                    <div class="reveal delay-1">
+                        <h4 style="margin-bottom: 20px;">Quick Links</h4>
+                        <ul style="list-style: none; font-size: 0.9rem; line-height: 2;">
+                            <li><a href="home.html" style="color: #94a3b8; text-decoration: none;">Home</a></li>
+                            <li><a href="about.html" style="color: #94a3b8; text-decoration: none;">About Us</a></li>
+                            <li><a href="work.html" style="color: #94a3b8; text-decoration: none;">Our Working</a></li>
+                            <li><a href="contact.html" style="color: #94a3b8; text-decoration: none;">Contact</a></li>
+                            <li><a href="colab.html" style="color: white; text-decoration: none;">Our Collaborators</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="reveal delay-2">
+                        <h4 style="margin-bottom: 20px;">Institution</h4>
+                        <p style="font-size: 0.9rem; color: #94a3b8;">Aditya Silver Oak Institute of Technology</p>
+                        <p style="font-size: 0.9rem; color: #94a3b8;">Silver Oak University</p>
+                    </div>
+                </div>
+                
+                <div class="reveal delay-3" style="text-align: center; padding-top: 30px; border-top: 1px solid #1e293b; color: #94a3b8; font-size: 0.8rem;">
+                    &copy; 2026 Lifynk | e-Blood Bank System. All rights reserved.
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Filter Functionality
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelector('.filter-btn.active').classList.remove('active');
+                    btn.classList.add('active');
+                    const filter = btn.getAttribute('data-filter');
+                    document.querySelectorAll('.partner-card').forEach(card => {
+                        if (filter === 'all' || card.classList.contains(filter)) {
+                            card.style.display = 'block';
+                            setTimeout(() => card.style.opacity = '1', 10);
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Intersection Observer for animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+        </script>
+    </body>
+</html>

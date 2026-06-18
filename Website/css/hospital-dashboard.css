@@ -1,0 +1,209 @@
+/* ================================================================
+   Lifynk — dashboard-hospital.css
+   Used by: hospital-dashboard.html, ngo-dashboard.html
+   Load AFTER dashboard-shared.css — overrides sidebar only.
+   Collapses sidebar to 68px (icon-only), expands on hover.
+================================================================ */
+
+/* ── Shell: block so fixed sidebar doesn't push main ────────── */
+.dashboard-shell {
+    display: block;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Sidebar: fixed, collapsed 68px → 260px on hover ────────── */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-collapsed);     /* 68px */
+    height: 100vh;
+    min-width: unset;
+    overflow: hidden;
+    padding: 20px 0;
+    z-index: 200;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease;
+}
+
+.sidebar:hover {
+    width: 260px;
+    box-shadow: 4px 0 32px rgba(0,0,0,0.08);
+}
+
+[data-theme="dark"] .sidebar:hover {
+    box-shadow: 4px 0 32px rgba(0,0,0,0.35);
+}
+
+/* ── Brand: full width inside, sidebar clips ─────────────────── */
+.sidebar-brand {
+    width: 260px;
+    padding: 0 16px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.sidebar-brand-name {
+    opacity: 0;
+    transition: opacity 0.18s ease 0.08s;
+}
+.sidebar:hover .sidebar-brand-name { opacity: 1; }
+
+/* ── Role badge ──────────────────────────────────────────────── */
+.role-badge {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 20px;
+    padding: 0 auto 6px;
+    border-radius: 50%;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: width 0.3s cubic-bezier(0.4,0,0.2,1),
+                height 0.3s cubic-bezier(0.4,0,0.2,1),
+                border-radius 0.3s cubic-bezier(0.4,0,0.2,1),
+                padding 0.3s cubic-bezier(0.4,0,0.2,1),
+                margin 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+.role-badge-text {
+    opacity: 0;
+    transition: opacity 0.18s ease 0.08s;
+    white-space: nowrap;
+}
+.sidebar:hover .role-badge-text { opacity: 1; }
+
+/* Expanded: back to full pill */
+.sidebar:hover .role-badge {
+    width: calc(260px - 32px);
+    height: auto;
+    margin: 0 16px 20px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    justify-content: flex-start;
+}
+
+/* ── Section labels ──────────────────────────────────────────── */
+.nav-section-label {
+    width: 260px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.18s ease 0.08s;
+    flex-shrink: 0;
+}
+.sidebar:hover .nav-section-label { opacity: 1; }
+
+/* ── Nav menu ────────────────────────────────────────────────── */
+.nav-menu { width: 260px; box-sizing: border-box; flex-shrink: 0; }
+
+.nav-item {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    transform: none !important;
+}
+
+.nav-item.active {
+    background: transparent;
+}
+.nav-item.active i {
+    background: var(--nav-active-bg);
+    color: var(--nav-active-text);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 15px;
+    transition: border-radius 0.3s ease, background 0.4s ease;
+}
+.sidebar:hover .nav-item.active {
+    background: var(--nav-active-bg);
+    border-radius: 8px;
+}
+.sidebar:hover .nav-item.active i {
+    background: transparent;
+    color: var(--nav-active-text);
+    width: 18px;
+    height: auto;
+    border-radius: 0;
+    display: inline;
+    font-size: 15px;
+}
+
+/* Labels hidden when collapsed */
+.nav-item span:not(.nav-badge) {
+    opacity: 0;
+    transition: opacity 0.18s ease 0.08s;
+}
+.sidebar:hover .nav-item span:not(.nav-badge) { opacity: 1; }
+
+/* Badge */
+.nav-item .nav-badge {
+    opacity: 0;
+    transition: opacity 0.18s ease 0.08s;
+}
+.sidebar:hover .nav-item .nav-badge { opacity: 1; }
+
+/* ── Bottom user row ─────────────────────────────────────────── */
+.sidebar-bottom {
+    width: 260px;
+    box-sizing: border-box;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sidebar-user {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sidebar-user-info {
+    opacity: 0;
+    transition: opacity 0.18s ease 0.08s;
+}
+.sidebar:hover .sidebar-user-info { opacity: 1; }
+
+.sidebar-user .fa-arrow-right-from-bracket {
+    opacity: 0;
+    transition: opacity 0.18s ease 0.08s;
+}
+.sidebar:hover .sidebar-user .fa-arrow-right-from-bracket { opacity: 1; }
+
+/* ── Main content: always 68px offset, never shifts ─────────── */
+.main-content {
+    margin-left: var(--sidebar-collapsed);  /* 68px */
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ── Mobile: bottom tab bar ──────────────────────────────────── */
+@media (max-width: 900px) {
+    .sidebar {
+        position: fixed;
+        top: auto; bottom: 0; left: 0;
+        width: 100% !important;
+        height: 60px;
+        flex-direction: row;
+        padding: 0 12px;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        overflow-x: auto;
+        align-items: center;
+    }
+    .sidebar:hover { width: 100% !important; box-shadow: none !important; }
+    .sidebar-brand { margin-bottom: 0; margin-right: 12px; padding: 0 8px; width: auto; }
+    .role-badge, .nav-section-label, .sidebar-bottom { display: none !important; }
+    .nav-menu  { display: flex; flex-direction: row; gap: 4px; padding: 0; width: auto; }
+    .nav-item  { padding: 10px; width: auto !important; }
+    .nav-item span:not(.nav-badge), .nav-item .nav-badge { display: none !important; }
+    .main-content { margin-left: 0; padding-bottom: 80px; height: 100vh; }
+}

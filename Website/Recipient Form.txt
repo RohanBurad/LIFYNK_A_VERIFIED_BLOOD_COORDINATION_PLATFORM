@@ -1,0 +1,95 @@
+<form id="form-recipient" class="signup-form" data-role="recipient" style="display:none;">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="recipient-name" placeholder="Your Full Name" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Blood Group Needed</label>
+                        <select id="recipient-blood" required>
+                            <option value="">Select</option>
+                            <option>A+</option><option>A-</option>
+                            <option>B+</option><option>B-</option>
+                            <option>O+</option><option>O-</option>
+                            <option>AB+</option><option>AB-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Age</label>
+                        <input type="number" id="recipient-age" placeholder="Age" min="1" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Gender</label>
+                        <select id="recipient-gender" required>
+                            <option value="">Select</option>
+                            <option>Male</option><option>Female</option><option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <div class="phone-row">
+                        <select class="country-code-select" id="recipient-code">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+27">🇿🇦 +27</option>
+                        </select>
+                        <input type="tel" id="recipient-phone" class="phone-number-input"
+                               placeholder="9876543210" pattern="[0-9]{7,12}" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>City / Area</label>
+                    <input type="text" id="recipient-city" placeholder="e.g. Ahmedabad, Gujarat" required>
+                </div>
+                <div class="input-group">
+                    <label>Medical Condition
+                        <span style="color:#94a3b8;font-weight:400;">(optional)</span>
+                    </label>
+                    <input type="text" id="recipient-condition"
+                           placeholder="e.g. Thalassemia, Surgery, Accident">
+                </div>
+                <div class="input-group">
+                    <label class="label-urgent">Urgency Level</label>
+                    <select id="recipient-urgency" class="recipient-urgency" required>
+                        <option value="Critical">🔴 Critical — Immediate</option>
+                        <option value="High">🟠 High — Within 12 Hours</option>
+                        <option value="Medium">🟡 Medium — Within 24 Hours</option>
+                        <option value="Planned">🟢 Planned — Scheduled</option>
+                    </select>
+                </div>
+                <div class="verification-box">
+                    <label class="section-label">
+                        <i class="fa-solid fa-file-prescription"></i> Medical Verification
+                    </label>
+                    <p style="font-size:12px;color:#475569;margin-bottom:12px;">
+                        Upload a doctor's prescription or hospital letter for faster NGO approval.
+                    </p>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-file-medical"></i>
+                        <p>Upload Prescription / Medical Letter</p>
+                        <input type="file" id="recipient-doc" accept="image/*,.pdf" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="recipient-password" placeholder="Create Password" required>
+                </div>
+                <div class="terms">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms & Conditions</a></span>
+                </div>
+                <button type="submit" class="btn-submit"
+                        style="background:#e11d48;box-shadow:0 4px 10px rgba(225,29,72,0.2);">
+                    <i class="fa-solid fa-user-injured"></i> Register as Recipient
+                </button>
+            </form>

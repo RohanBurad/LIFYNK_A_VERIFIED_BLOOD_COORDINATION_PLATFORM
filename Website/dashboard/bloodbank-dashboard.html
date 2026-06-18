@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blood Bank Dashboard | Lifynk</title>
+  <link rel="icon" href="../assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/dashboard-shared.css" />
+  <link rel="stylesheet" href="../css/hospital-dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* ── EXTRA TOKENS ─────────────────────────────────────── */
+    :root {
+      --danger-dim:  #e11d4820;
+      --warn-dim:    #f59e0b20;
+      --ok-dim:      #22c55e20;
+      --purple-dim:  #8b5cf620;
+      --blue-dim:    #3b82f620;
+      --ok:          #22c55e;
+      --warn:        #f59e0b;
+      --danger:      #e11d48;
+      --purple:      #8b5cf6;
+      --blue:        #3b82f6;
+      --orange:      #f97316;
+      --orange-dim:  #f9731620;
+    }
+    
+
+    /* ── TOPBAR ALERT ─────────────────────────────────────── */
+    .topbar-alert {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--danger-dim); border: 1px solid #e11d4840;
+      color: var(--danger); border-radius: 20px; padding: 6px 14px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      animation: pulse-border 2s infinite;
+    }
+    @keyframes pulse-border {
+      0%,100% { box-shadow: 0 0 0 0 rgba(225,29,72,.3); }
+      50%      { box-shadow: 0 0 0 5px rgba(225,29,72,0); }
+    }
+    .blink-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--danger); animation: blink 1s infinite; flex-shrink: 0;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── SECTION HEADER ───────────────────────────────────── */
+    .section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin: 28px 0 14px;
+    }
+    .section-header h2 { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .section-tag {
+      font-size: 11px; font-weight: 700; padding: 3px 10px;
+      border-radius: 20px; background: var(--primary-soft); color: var(--primary);
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+
+    /* ── GRID HELPERS ─────────────────────────────────────── */
+    .cmd-grid { display: grid; gap: 16px; }
+    .g-4  { grid-template-columns: repeat(4,1fr); }
+    .g-3  { grid-template-columns: repeat(3,1fr); }
+    .g-2  { grid-template-columns: repeat(2,1fr); }
+    .g-75 { grid-template-columns: 7fr 5fr; }
+    .g-57 { grid-template-columns: 5fr 7fr; }
+    @media(max-width:1200px){ .g-4{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:860px){
+      .g-3,.g-75,.g-57,.g-2 { grid-template-columns:1fr }
+    }
+
+    /* ── CARD BASE ────────────────────────────────────────── */
+    .cmd-card {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px; padding: 22px;
+      box-shadow: var(--card-shadow);
+      transition: box-shadow .2s, transform .2s, background .3s;
+      position: relative; overflow: hidden;
+    }
+    .cmd-card:hover { box-shadow: var(--card-shadow-hover); transform: translateY(-2px); }
+    .cmd-card-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--text-muted); margin-bottom: 6px;
+    }
+    .cmd-card-value { font-size: 32px; font-weight: 800; line-height: 1; color: var(--text-primary); }
+    .cmd-card-sub   { font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; }
+    .cmd-card-icon  {
+      position: absolute; right: 20px; top: 20px;
+      width: 40px; height: 40px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 16px;
+    }
+    .stat-trend      { font-size: 12px; font-weight: 600; margin-top: 8px; }
+    .stat-trend.up   { color: var(--ok); }
+    .stat-trend.down { color: var(--danger); }
+
+    /* ── CHIP / BADGE ─────────────────────────────────────── */
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px;
+    }
+    .chip-ok     { background: var(--ok-dim);     color: var(--ok); }
+    .chip-warn   { background: var(--warn-dim);   color: var(--warn); }
+    .chip-danger { background: var(--danger-dim); color: var(--danger); }
+    .chip-teal   { background: var(--primary-soft); color: var(--primary); }
+    .chip-purple { background: var(--purple-dim); color: var(--purple); }
+    .chip-blue   { background: var(--blue-dim);   color: var(--blue); }
+    .chip-orange { background: var(--orange-dim); color: var(--orange); }
+
+    /* ── HEATMAP ──────────────────────────────────────────── */
+    .heatmap-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 16px; }
+    .hm-cell {
+      border-radius: 12px; padding: 14px 12px; text-align: center;
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+      border: 1.5px solid transparent;
+    }
+    .hm-cell:hover { transform: scale(1.05); box-shadow: var(--card-shadow-hover); }
+    .hm-cell.ok    { background:#dcfce7; border-color:#86efac; color:#166534; }
+    .hm-cell.warn  { background:#fef9c3; border-color:#fde047; color:#713f12; }
+    .hm-cell.low   { background:#fee2e2; border-color:#fca5a5; color:#7f1d1d; }
+    .hm-cell.empty { background:#f1f5f9; border-color:#cbd5e1; color:#64748b; }
+    [data-theme="dark"] .hm-cell.ok    { background:#14532d80; border-color:#16a34a; color:#86efac; }
+    [data-theme="dark"] .hm-cell.warn  { background:#71300020; border-color:#ca8a04; color:#fde68a; }
+    [data-theme="dark"] .hm-cell.low   { background:#7f1d1d40; border-color:#ef4444; color:#fca5a5; }
+    [data-theme="dark"] .hm-cell.empty { background:#1e293b;   border-color:#334155; color:#64748b; }
+    .hm-bg    { font-size: 21px; font-weight: 800; line-height: 1; }
+    .hm-units { font-size: 20px; font-weight: 900; margin: 4px 0 2px; }
+    .hm-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; opacity: .7; }
+    .hm-bar-wrap { height: 4px; background: rgba(0,0,0,.1); border-radius: 4px; margin-top: 8px; }
+    .hm-bar { height: 4px; border-radius: 4px; transition: width 1s ease; }
+    .ok .hm-bar   { background: #22c55e; }
+    .warn .hm-bar { background: #f59e0b; }
+    .low .hm-bar  { background: #ef4444; }
+    .empty .hm-bar{ background: #94a3b8; }
+    .hm-legend { display:flex; gap:14px; flex-wrap:wrap; margin-top:14px; align-items:center; }
+    .hm-legend-item { display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; color:var(--text-secondary); }
+    .hm-legend-dot  { width:10px; height:10px; border-radius:3px; }
+
+    /* ── TABLE BASE ───────────────────────────────────────── */
+    .bb-table { width:100%; border-collapse:collapse; }
+    .bb-table th {
+      text-align:left; font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.06em;
+      color:var(--text-muted); padding:0 12px 10px;
+      border-bottom:1px solid var(--border-color);
+    }
+    .bb-table td {
+      padding:12px; font-size:13px;
+      border-bottom:1px solid var(--border-color); vertical-align:middle;
+    }
+    .bb-table tr:last-child td { border-bottom:none; }
+    .bb-table tr { transition:background .15s; cursor:pointer; }
+    .bb-table tr:hover td { background: var(--surface-2); }
+
+    /* ── URGENCY CHIPS ────────────────────────────────────── */
+    .urgency-chip { display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px; }
+    .u-critical { background:var(--danger-dim); color:var(--danger); }
+    .u-high     { background:var(--warn-dim);   color:var(--warn); }
+    .u-normal   { background:var(--ok-dim);     color:var(--ok); }
+
+    /* ── STATUS DOT ───────────────────────────────────────── */
+    .status-dot-sm { width:7px; height:7px; border-radius:50%; display:inline-block; margin-right:6px; flex-shrink:0; }
+
+    /* ── AUDIT TRAIL ──────────────────────────────────────── */
+    .audit-entry { display:flex; gap:14px; padding:13px 0; border-bottom:1px solid var(--border-subtle); }
+    .audit-entry:last-child { border-bottom:none; }
+    .audit-icon { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-size:14px; flex-shrink:0; }
+    .audit-text { font-size:13px; color:var(--text-secondary); line-height:1.5; }
+    .audit-text strong { color:var(--text-primary); }
+    .audit-time { font-size:11px; color:var(--text-muted); margin-top:3px; font-weight:600; }
+
+    /* ── DONOR ROW ────────────────────────────────────────── */
+    .donor-row { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--border-subtle); }
+    .donor-row:last-child { border-bottom:none; }
+    .donor-avatar { width:36px; height:36px; border-radius:50%; background:var(--primary); color:white; font-size:12px; font-weight:800; display:grid; place-items:center; flex-shrink:0; }
+    .donor-name { font-size:13px; font-weight:700; color:var(--text-primary); }
+    .donor-meta { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+    .donor-score { font-size:18px; font-weight:800; color:var(--primary); text-align:center; line-height:1; }
+    .donor-score span { display:block; font-size:9px; color:var(--text-muted); font-weight:600; }
+
+    /* ── DATA STORAGE SECTION ─────────────────────────────── */
+    .storage-tabs {
+      display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .stab {
+      padding: 8px 18px; border-radius: 10px; font-size: 13px; font-weight: 700;
+      border: 1.5px solid var(--border); background: var(--surface-2);
+      color: var(--text-secondary); cursor: pointer; transition: all .2s;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .stab:hover { border-color: var(--primary); color: var(--primary); }
+    .stab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Upload Drop Zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 14px; padding: 36px 20px;
+      text-align: center; cursor: pointer;
+      transition: all .25s; background: var(--surface-2);
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--primary); background: var(--primary-soft);
+    }
+    .upload-zone i { font-size: 36px; color: var(--primary); margin-bottom: 10px; display: block; }
+    .upload-zone h4 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .upload-zone p  { font-size: 12.5px; color: var(--text-muted); }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .upload-type-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .upload-type-btn {
+      flex: 1; min-width: 100px; padding: 11px 14px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: var(--surface);
+      font-size: 12px; font-weight: 700; color: var(--text-secondary);
+      cursor: pointer; transition: all .2s; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .upload-type-btn i { font-size: 20px; }
+    .upload-type-btn.selected { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+    .upload-type-btn:hover    { border-color: var(--primary); color: var(--primary); }
+
+    /* File rows in storage */
+    .file-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 16px; border-radius: 12px;
+      border: 1px solid var(--border-subtle); background: var(--surface);
+      margin-bottom: 10px; transition: all .2s; cursor: pointer;
+    }
+    .file-row:hover { border-color: var(--primary); box-shadow: var(--card-shadow-hover); transform: translateX(3px); }
+    .file-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 18px; flex-shrink: 0;
+    }
+    .file-icon.pdf    { background: #fee2e2; color: #e11d48; }
+    .file-icon.excel  { background: #dcfce7; color: #16a34a; }
+    .file-icon.doc    { background: var(--blue-dim); color: var(--blue); }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+    .file-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .icon-btn {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text-muted); cursor: pointer;
+      display: grid; place-items: center; font-size: 12px; transition: all .2s;
+    }
+    .icon-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+    .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-dim); }
+
+    /* Search bar */
+    .search-bar-wrap {
+      position: relative; margin-bottom: 16px;
+    }
+    .search-bar-wrap i {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 13px;
+    }
+    .search-bar {
+      width: 100%; padding: 10px 14px 10px 38px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      background: var(--surface-2); color: var(--text-primary);
+      font-family: inherit; font-size: 13px; outline: none; transition: border .2s;
+    }
+    .search-bar:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+
+    /* Update record form */
+    .update-form { display: none; }
+    .update-form.open { display: block; }
+    .form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-field { display: flex; flex-direction: column; gap: 5px; }
+    .form-field label { font-size: 11.5px; font-weight: 700; color: var(--text-secondary); }
+    .form-field input, .form-field select, .form-field textarea {
+      background: var(--surface); border: 1.5px solid var(--border-color);
+      color: var(--text-primary); border-radius: 9px; padding: 9px 12px;
+      font-family: inherit; font-size: 13px; outline: none; transition: border .15s;
+    }
+    .form-field textarea { resize: vertical; min-height: 80px; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,148,136,.15);
+    }
+
+    /* Export buttons */
+    .export-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-top: 16px; }
+    .export-card {
+      border: 1.5px solid var(--border); border-radius: 14px; padding: 18px 16px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      cursor: pointer; transition: all .2s; background: var(--surface-2);
+    }
+    .export-card:hover { border-color: var(--primary); background: var(--primary-soft); transform: translateY(-2px); }
+    .export-card i { font-size: 28px; }
+    .export-card span { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-align: center; }
+    .export-card:hover span { color: var(--primary); }
+
+    /* Storage stats bar */
+    .storage-bar-wrap { background: var(--surface-2); border-radius: 99px; height: 8px; margin: 10px 0 6px; overflow: hidden; }
+    .storage-bar-fill { height: 100%; border-radius: 99px; transition: width 1s ease; }
+
+    /* ── MODAL ────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px); z-index: 300;
+      display: none; place-items: center;
+    }
+    .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 20px; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border-color);
+      border-radius: 20px; padding: 28px; width: 520px; max-width: 95vw;
+      box-shadow: 0 24px 80px rgba(0,0,0,.25);
+      animation: modal-in .25s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes modal-in { from{opacity:0;transform:translateY(20px) scale(.97)} }
+    .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 18px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+    .modal-close { background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; margin-left: auto; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+    /* ── ENTRANCE ─────────────────────────────────────────── */
+    .fade-up { opacity:0; transform:translateY(18px); animation:fadeUp .5s forwards; }
+    @keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
+    .d1{animation-delay:.05s} .d2{animation-delay:.10s}
+    .d3{animation-delay:.15s} .d4{animation-delay:.20s}
+    .d5{animation-delay:.25s} .d6{animation-delay:.30s}
+  
+    /* ── Dark mode: suppress button glows ────────────────── */
+    [data-theme="dark"] .btn-primary { box-shadow: none !important; }
+    [data-theme="dark"] .btn-primary:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
+
+    /* ── NOTIFICATION PANEL (B2) ────────────────────────── */
+    .header-profile-dropdown {
+      display: none;
+      position: fixed;
+      top: 68px;
+      right: 20px;
+      width: 230px;
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+      z-index: 9999;
+      padding: 8px;
+      animation: modal-in .2s ease;
+    }
+    .header-profile-dropdown.open { display: block; }
+    .hpd-header { display: flex; align-items: center; gap: 10px; padding: 10px 8px 12px; }
+    .hpd-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+    .hpd-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .hpd-role { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .hpd-divider { height: 1px; background: var(--border-color); margin: 4px 0; }
+    .hpd-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all .15s; }
+    .hpd-item:hover { background: var(--primary-soft); color: var(--primary); }
+    .hpd-item i { width: 16px; text-align: center; }
+    .hpd-logout { color: var(--danger) !important; }
+    .hpd-logout:hover { background: var(--danger-dim) !important; color: var(--danger) !important; }
+    #notifPanel {
+      display: none; position: fixed;
+      width: 300px; max-height: 420px; overflow-y: auto;
+      background: var(--surface); border: 1px solid var(--border-color);
+      border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+      z-index: 9999; animation: modal-in .2s ease;
+    }
+</style>
+</head>
+<body>
+<div class="dashboard-shell">
+
+  <!-- ═══════════ SIDEBAR ═══════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="../assets/favicon.png" alt="Lifynk" />
+      <span class="sidebar-brand-name">Lif<span>ynk</span></span>
+    </div>
+
+    <div class="role-badge">
+      <i class="fa-solid fa-flask"></i>
+      <span class="role-badge-text">Blood Bank</span>
+    </div>
+
+    <span class="nav-section-label">Main</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item active" href="#" data-section="overview">
+        <i class="fa-solid fa-border-all"></i><span>Overview</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="inventory">
+        <i class="fa-solid fa-droplet"></i><span>Inventory &amp; Stock</span>
+        <span class="nav-badge" id="inventoryNavBadge" style="display:none">0</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="requests">
+        <i class="fa-solid fa-droplet"></i><span>Blood Donation Requests</span>
+        <span class="nav-badge" id="requestNavBadge" style="display:none">0</span>
+      </a></li>
+      <li><a class="nav-item" href="#" data-section="donors">
+        <i class="fa-solid fa-users"></i><span>Verified Donor Pool</span>
+      </a></li>
+      <li>
+        <a class="nav-item" href="#" data-section="appointments">
+          <i class="fa-solid fa-microscope"></i><span>Verification Requests</span><span class="nav-badge" id="apptNavBadge" style="display:none">0</span></a>
+      </li>
+    </ul>
+
+
+    <span class="nav-section-label">Account</span>
+    <ul class="nav-menu">
+      <li><a class="nav-item" href="#" data-section="settings">
+        <i class="fa-solid fa-gear"></i><span>Settings</span>
+      </a></li>
+    </ul>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName"></div>
+          <div class="sidebar-user-role" id="sidebarRole">Blood Bank</div>
+        </div>
+        <i class="fa-solid fa-arrow-right-from-bracket" id="sidebarLogoutBtn"
+           style="color:var(--text-muted);font-size:13px;cursor:pointer;margin-left:auto;"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN CONTENT ══════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+      <div class="header-left">
+        <h1 id="greetingTitle">Blood Bank 🧪</h1>
+        <p id="dateStr">Sunday, 22 March 2026 · City Blood Bank, Ahmedabad</p>
+      </div>
+      <div class="header-right">
+        <div class="topbar-alert" onclick="document.querySelector('[data-section=inventory]').click()">
+          <div class="blink-dot"></div> 2 Low Stock Alerts
+        </div>
+        <button class="theme-toggle-btn" id="themeToggle">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="notif-btn" id="bbNotifBtn">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notif-count" id="notifCountBadge" style="display:none">0</span>
+        </button>
+        <div class="header-avatar-wrap" id="headerAvatarWrap">
+          <div id="headerAvatarPlaceholder"
+               style="width:36px;height:36px;border-radius:50%;background:var(--border-color);animation:pulse 1.5s infinite">
+          </div>
+          <img id="headerAvatar" src="" alt="Avatar" class="header-avatar" style="display:none">
+        </div>
+        <div class="header-profile-dropdown" id="headerDropdown">
+          <div class="hpd-header">
+            <img id="hdpAvatar" src="https://ui-avatars.com/api/?name=User&background=0d9488&color=fff&size=80" class="hpd-avatar">
+            <div>
+              <div class="hpd-name" id="hdpName"></div>
+              <div class="hpd-role">🧪 Blood Bank</div>
+            </div>
+          </div>
+          <div class="hpd-divider"></div>
+          <div class="hpd-item" onclick="document.getElementById('profilePhotoInput').click()">
+            <i class="fa-solid fa-camera"></i> Change Photo
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+          </div>
+          <div class="hpd-item" id="profileToggleBtn" onclick="toggleProfilePanel()" style="justify-content:space-between">
+            <span><i class="fa-solid fa-user" style="width:16px;text-align:center;margin-right:10px"></i> My Profile</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:11px;color:var(--text-muted);transition:transform .2s"></i>
+          </div>
+          <div id="hpdProfilePanel" style="display:none;padding:10px 12px;background:var(--surface-2);border-radius:10px;margin:4px 0">
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+              <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:3px">Name</label><input id="hpdNameInput" type="text" style="width:100%;padding:7px 10px;border:1.5px solid var(--border-color);border-radius:8px;background:var(--surface);color:var(--text-primary);font-size:12px;font-family:inherit;outline:none"/></div>
+              <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:3px">Email</label><input id="hpdEmailInput" type="email" style="width:100%;padding:7px 10px;border:1.5px solid var(--border-color);border-radius:8px;background:var(--surface);color:var(--text-primary);font-size:12px;font-family:inherit;outline:none"/></div>
+              <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:3px">Phone</label><input id="hpdPhoneInput" type="tel" style="width:100%;padding:7px 10px;border:1.5px solid var(--border-color);border-radius:8px;background:var(--surface);color:var(--text-primary);font-size:12px;font-family:inherit;outline:none"/></div>
+              <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:3px">City</label><input id="hpdCityInput" type="text" style="width:100%;padding:7px 10px;border:1.5px solid var(--border-color);border-radius:8px;background:var(--surface);color:var(--text-primary);font-size:12px;font-family:inherit;outline:none"/></div>
+            </div>
+            <button onclick="saveHpdProfile()" style="width:100%;padding:8px;background:var(--primary);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fa-solid fa-check"></i> Save Profile</button>
+          </div>
+          <div class="hpd-divider"></div>
+          <div class="hpd-item hpd-logout" id="logoutBtn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ SECTION: OVERVIEW ══════════════════════ -->
+    <section id="sec-overview">
+      <div class="section-header fade-up d1">
+        <h2>Overview</h2>
+        <span class="section-tag">Live</span>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="cmd-grid g-4 fade-up d2">
+        <div class="cmd-card">
+          <div class="cmd-card-icon" style="background:var(--danger-dim);color:var(--danger)">
+            <i class="fa-solid fa-droplet"></i>
+          </div>
+          <div class="cmd-card-label">Total Units</div>
+          <div class="cmd-card-value" data-stat="totalUnits">—</div>
+          <div class="cmd-card-sub">Across all 8 blood groups</div>
+          <div class="stat-trend up" data-stat="totalUnitsTrend"><i class="fa-solid fa-arrow-trend-up"></i> Loading…</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-card-icon" style="background:var(--warn-dim);color:var(--warn)">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div class="cmd-card-label">Low Stock Groups</div>
+          <div class="cmd-card-value" style="color:var(--warn)" data-stat="lowStockCount">—</div>
+          <div class="cmd-card-sub" data-stat="lowStockGroups">Checking…</div>
+          <div class="stat-trend down" data-stat="lowStockTrend"><i class="fa-solid fa-arrow-trend-down"></i> Loading…</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-card-icon" style="background:var(--ok-dim);color:var(--ok)">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div class="cmd-card-label">Requests Today</div>
+          <div class="cmd-card-value" data-stat="requestsToday">—</div>
+          <div class="cmd-card-sub" data-stat="requestsSub">Loading…</div>
+          <div class="stat-trend up" data-stat="requestsTrend"><i class="fa-solid fa-arrow-trend-up"></i> Loading…</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-card-icon" style="background:var(--primary-soft);color:var(--primary)">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div class="cmd-card-label">Registered Donors</div>
+          <div class="cmd-card-value" data-stat="totalDonors">—</div>
+          <div class="cmd-card-sub" data-stat="eligibleDonors">Loading…</div>
+          <div class="stat-trend up" data-stat="donorsTrend"><i class="fa-solid fa-arrow-trend-up"></i> Loading…</div>
+        </div>
+      </div>
+
+      <!-- Blood Inventory Heatmap -->
+      <div class="section-header fade-up d3">
+        <h2>Blood Inventory Heatmap</h2>
+        <span class="section-tag">Live Stock</span>
+      </div>
+      <div class="cmd-card fade-up d3">
+        <div class="heatmap-grid" id="heatmapGrid"></div>
+        <div class="hm-legend">
+          <span style="font-size:12px;font-weight:700;color:var(--text-secondary)">Stock Level:</span>
+          <div class="hm-legend-item"><div class="hm-legend-dot" style="background:#22c55e"></div>Sufficient (20+u)</div>
+          <div class="hm-legend-item"><div class="hm-legend-dot" style="background:#f59e0b"></div>Low (6–19u)</div>
+          <div class="hm-legend-item"><div class="hm-legend-dot" style="background:#ef4444"></div>Critical (&lt;6u)</div>
+          <div class="hm-legend-item"><div class="hm-legend-dot" style="background:#94a3b8"></div>Empty</div>
+        </div>
+      </div>
+
+      <!-- Audit trail -->
+      <div class="section-header fade-up d4">
+        <h2>Activity Log</h2>
+        <span class="section-tag">Today</span>
+      </div>
+      <div class="cmd-card fade-up d4">
+        <div id="auditList"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════ SECTION: INVENTORY ═════════════════════ -->
+    <section id="sec-inventory" style="display:none">
+      <div class="section-header fade-up d1">
+        <h2>Inventory &amp; Stock</h2>
+        <span class="section-tag">Manage</span>
+        <button class="btn-primary" style="margin-left:auto" onclick="openUpdateModal('inventory')">
+          <i class="fa-solid fa-plus"></i> Add Stock
+        </button>
+      </div>
+      <div class="cmd-card fade-up d2">
+        <div class="heatmap-grid" id="heatmapGridFull"></div>
+        <div class="hm-legend" style="margin-top:20px">
+          <span style="font-size:12px;font-weight:700;color:var(--text-secondary)">Stock Level:</span>
+          <div class="hm-legend-item"><div class="hm-legend-dot" style="background:#22c55e"></div>Sufficient (20+u)</div>
+          <div class="hm-legend-item"><div class="hm-legend-dot" style="background:#f59e0b"></div>Low (6–19u)</div>
+          <div class="hm-legend-item"><div class="hm-legend-dot" style="background:#ef4444"></div>Critical (&lt;6u)</div>
+        </div>
+      </div>
+
+      <div class="section-header fade-up d3">
+        <h2>Stock Ledger</h2>
+        <span class="section-tag">All Batches</span>
+      </div>
+      <div class="cmd-card fade-up d3">
+        <table class="bb-table" id="stockTable">
+          <thead>
+            <tr>
+              <th>Batch ID</th>
+              <th>Blood Group</th>
+              <th>Units</th>
+              <th>Collected</th>
+              <th>Expiry</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="stockBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════ SECTION: REQUESTS & ORDERS ══════════════ -->
+    <section id="sec-requests" style="display:none">
+      <div class="section-header fade-up d1">
+        <h2>Blood Donation Requests</h2>
+        <span class="section-tag">Live</span>
+      </div>
+      <div class="cmd-card fade-up d2">
+        <table class="bb-table">
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Donor</th>
+              <th>Blood Group</th>
+              <th>Donation Type</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="requestBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════ SECTION: DONOR RECORDS ═════════════════ -->
+    <section id="sec-donors" style="display:none">
+      <div class="section-header fade-up d1">
+        <h2>Verified Donor Pool</h2>
+        <span class="section-tag">Registry</span>
+        <button class="btn-primary" style="margin-left:auto" onclick="openUpdateModal('donor')">
+          <i class="fa-solid fa-user-plus"></i> Add Donor
+        </button>
+      </div>
+      <div class="cmd-card fade-up d2">
+        <table class="bb-table">
+          <thead>
+            <tr>
+              <th>Donor ID</th>
+              <th>Name</th>
+              <th>Blood Group</th>
+              <th>Age</th>
+              <th>Last Donation</th>
+              <th>Total Donations</th>
+              <th>Eligible</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="donorBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════ SECTION: SETTINGS ══════════════════════ -->
+    <section id="sec-settings" style="display:none">
+      <div class="section-header fade-up d1">
+        <h2>Settings</h2>
+        <span class="section-tag">Preferences</span>
+      </div>
+      <div class="cmd-card fade-up d2" style="max-width:600px">
+        <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:16px">Notifications</p>
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Low stock alerts</div>
+              <div style="font-size:12px;color:var(--text-muted)">Notify when any group falls below threshold</div>
+            </div>
+            <div style="width:40px;height:22px;background:var(--primary);border-radius:99px;cursor:pointer;position:relative">
+              <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;right:2px;transition:.2s"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Expiry reminders</div>
+              <div style="font-size:12px;color:var(--text-muted)">Alert 3 days before blood units expire</div>
+            </div>
+            <div style="width:40px;height:22px;background:var(--primary);border-radius:99px;cursor:pointer;position:relative">
+              <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;right:2px;transition:.2s"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary)">New request alerts</div>
+              <div style="font-size:12px;color:var(--text-muted)">Sound + badge for incoming hospital orders</div>
+            </div>
+            <div style="width:40px;height:22px;background:var(--border);border-radius:99px;cursor:pointer;position:relative">
+              <div style="width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;transition:.2s"></div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px">Appearance</p>
+        <div style="display:flex;gap:10px">
+          <button class="btn-primary" onclick="document.getElementById('themeToggle').click()">
+            <i class="fa-solid fa-circle-half-stroke"></i> Toggle Dark Mode
+          </button>
+        </div>
+      </div>
+    </section>
+    <section id="sec-appointments" style="display:none">
+      <div class="sec-header">
+        <h2>Verification Requests</h2>
+        <span class="section-tag">Live</span>
+      </div>
+      <div class="card">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Donor</th>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Blood</th>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Type</th>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Date & Time</th>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Status</th>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Notes</th>
+              <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Action</th>
+            </tr>
+          </thead>
+          <tbody id="apptTableBody">
+            <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted)">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size:20px;display:block;margin-bottom:8px"></i>
+              Loading appointments…
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main><!-- end main-content -->
+</div><!-- end dashboard-shell -->
+
+<!-- ═══════ UPDATE / ADD MODAL ══════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">
+      <i class="fa-solid fa-pen-to-square" style="color:var(--primary)"></i>
+      <span id="modalTitle">Update Record</span>
+      <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="submitModal()">
+        <i class="fa-solid fa-check"></i> Save Record
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ FINALISE REPORT MODAL ═══════════════════════════ -->
+<div class="modal-overlay" id="finaliseModalOverlay" onclick="closeFinaliseModal(event)" style="z-index:400">
+  <div class="modal" style="width:600px;margin:auto;">
+    <div class="modal-title" style="padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-color);padding-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--purple-dim);color:var(--purple);display:grid;place-items:center;font-size:16px">
+          <i class="fa-solid fa-flask-vial"></i>
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text-primary)" id="finaliseTitle">Finalise Lab Report</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="finaliseSubtitle">Donor · Last donation —</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeFinaliseModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div id="finaliseBody" style="padding:24px 28px;max-height:60vh;overflow-y:auto;overscroll-behavior:contain;">
+
+      <!-- Donor linkage banner -->
+      <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:14px 16px;margin-bottom:24px;display:flex;align-items:center;gap:10px">
+        <i class="fa-solid fa-link" style="color:var(--purple);flex-shrink:0"></i>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary)">Linking report to donor via phone number</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Report will appear live in the donor's Medical Resume once finalised</div>
+        </div>
+        <span id="finalisePhone" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--purple)"></span>
+      </div>
+
+      <!-- ── SECTION 1: Blood Grouping ─────────────────────── -->
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px">
+        <i class="fa-solid fa-droplet" style="color:var(--danger);margin-right:6px"></i>Section 1 — Blood Grouping
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;align-items:start;">
+        <div class="form-field">
+          <label>ABO Group *</label>
+          <select id="fABO">
+            <option value="">Select</option>
+            <option>A</option><option>B</option><option>AB</option><option>O</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Rh Typing *</label>
+          <select id="fRh">
+            <option value="">Select</option>
+            <option value="Positive">Positive (+)</option>
+            <option value="Negative">Negative (−)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Blood Group Confirmed *</label>
+          <select id="fBloodGroup">
+            <option value="">Auto / Override</option>
+            <option>A+</option><option>A−</option>
+            <option>B+</option><option>B−</option>
+            <option>AB+</option><option>AB−</option>
+            <option>O+</option><option>O−</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── SECTION 2: TTI Screening ──────────────────────── -->
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px">
+        <i class="fa-solid fa-vial-circle-check" style="color:var(--primary);margin-right:6px"></i>Section 2 — Transfusion-Transmitted Infections (TTIs)
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+
+        <div class="form-field">
+          <label>HIV 1 &amp; 2 *</label>
+          <select id="fHIV" class="result-select">
+            <option value="">Select result</option>
+            <option value="Non-Reactive">Non-Reactive ✓</option>
+            <option value="Reactive">Reactive ✗</option>
+            <option value="Indeterminate">Indeterminate</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Hepatitis B — HBsAg *</label>
+          <select id="fHepB" class="result-select">
+            <option value="">Select result</option>
+            <option value="Non-Reactive">Non-Reactive ✓</option>
+            <option value="Reactive">Reactive ✗</option>
+            <option value="Indeterminate">Indeterminate</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Hepatitis C — Anti-HCV *</label>
+          <select id="fHepC" class="result-select">
+            <option value="">Select result</option>
+            <option value="Non-Reactive">Non-Reactive ✓</option>
+            <option value="Reactive">Reactive ✗</option>
+            <option value="Indeterminate">Indeterminate</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Syphilis — VDRL / RPR *</label>
+          <select id="fSyphilis" class="result-select">
+            <option value="">Select result</option>
+            <option value="Non-Reactive">Non-Reactive ✓</option>
+            <option value="Reactive">Reactive ✗</option>
+            <option value="Indeterminate">Indeterminate</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Malaria *</label>
+          <select id="fMalaria" class="result-select">
+            <option value="">Select result</option>
+            <option value="Negative">Negative ✓</option>
+            <option value="Positive">Positive ✗</option>
+            <option value="Indeterminate">Indeterminate</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Nucleic Acid Testing (NAT)</label>
+          <select id="fNAT" class="result-select">
+            <option value="">Select result / N/A</option>
+            <option value="Non-Reactive">Non-Reactive ✓</option>
+            <option value="Reactive">Reactive ✗</option>
+            <option value="Not Done">Not Done</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- ── SECTION 3: Hematology ──────────────────────────── -->
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px">
+        <i class="fa-solid fa-flask" style="color:var(--orange);margin-right:6px"></i>Section 3 — Hematology
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div class="form-field">
+          <label>Hemoglobin — Hb (g/dL) *</label>
+          <input type="number" id="fHemoglobin" placeholder="e.g. 14.2" step="0.1" min="5" max="25"/>
+        </div>
+        <div class="form-field">
+          <label>Hematocrit / PCV (%)</label>
+          <input type="number" id="fPCV" placeholder="e.g. 42" step="0.1" min="20" max="65" style="-webkit-appearance:none;-moz-appearance:textfield;"/>
+        </div>
+        <div class="form-field">
+          <label>Antibody Screening</label>
+          <select id="fAntibody">
+            <option value="">Select result / N/A</option>
+            <option value="Negative">Negative ✓</option>
+            <option value="Positive">Positive — specify below</option>
+            <option value="Not Done">Not Done</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── SECTION 4: Report Details ─────────────────────── -->
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px">
+        <i class="fa-solid fa-notes-medical" style="color:var(--blue);margin-right:6px"></i>Section 4 — Report Details
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="form-field">
+          <label>Donation Date</label>
+          <input type="date" id="fDonationDate"/>
+        </div>
+        <div class="form-field">
+          <label>Blood Bank Name</label>
+          <input type="text" id="fBankName" value="City Blood Bank, Ahmedabad"/>
+        </div>
+        <div class="form-field">
+          <label>Lab Technician Name</label>
+          <input type="text" id="fTechName" placeholder="Name of technician who ran the tests"/>
+        </div>
+        <div class="form-field">
+          <label>Authorised / Finalised By *</label>
+          <input type="text" id="fFinalisedBy" value="Dr. Anika Singh" placeholder="Authorising doctor"/>
+        </div>
+        <div class="form-field">
+          <label>Next Eligible Donation Date</label>
+          <input type="date" id="fNextEligibleDate"/>
+        </div>
+        <div class="form-field" style="display:flex;align-items:center;gap:12px;padding-top:22px">
+          <input type="checkbox" id="fTemporaryDeferral" style="width:18px;height:18px;accent-color:var(--warn);cursor:pointer;flex-shrink:0"/>
+          <label for="fTemporaryDeferral" style="font-size:13px;font-weight:600;color:var(--text-primary);cursor:pointer;margin:0">
+            Mark as Temporary Deferral
+            <div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:2px">Donor will see an amber warning badge</div>
+          </label>
+        </div>
+      </div>
+      <div class="form-field" style="margin-bottom:4px">
+        <label>Lab Notes / Additional Observations (optional)</label>
+        <textarea id="fNotes" placeholder="Any additional observations, reactions, antibody specificity, NAT details, or remarks from the lab technician..."
+          style="min-height:72px;resize:vertical;width:100%;background:var(--surface);border:1.5px solid var(--border-color);
+                 color:var(--text-primary);border-radius:9px;padding:10px 13px;font-family:inherit;font-size:13px;outline:none"></textarea>
+      </div>
+
+      <!-- Section 5: Supporting Document (optional) -->
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px;margin-top:20px">
+        <i class="fa-solid fa-paperclip" style="color:var(--text-muted);margin-right:6px"></i>Section 5 — Supporting Document <span style="font-weight:500;text-transform:none;letter-spacing:0">(optional)</span>
+      </div>
+      <div id="attachDropZone" onclick="document.getElementById('fAttachFile').click()"
+        style="border:2px dashed var(--border-color);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;">
+        <input type="file" id="fAttachFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleAttachFile(this)"/>
+        <i class="fa-solid fa-file-arrow-up" style="font-size:22px;color:var(--text-muted);display:block;margin-bottom:8px"></i>
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary)">Click or drag to attach a PDF or scanned image</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">PDF, JPG, PNG &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Stored alongside report in donor's Medical Resume</div>
+      </div>
+      <div id="attachPreview" style="display:none;background:var(--surface-2);border:1px solid var(--border-color);border-radius:10px;padding:12px 14px;align-items:center;gap:12px;margin-top:8px">
+        <i id="attachIcon" class="fa-solid fa-file-pdf" style="font-size:22px;color:var(--danger);flex-shrink:0"></i>
+        <div style="flex:1;min-width:0">
+          <div id="attachFileName" style="font-size:13px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          <div id="attachFileSize" style="font-size:11px;color:var(--text-muted);margin-top:2px"></div>
+        </div>
+        <button onclick="clearAttachment()" style="background:var(--danger-dim);color:var(--danger);border:none;border-radius:8px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;font-size:12px;flex-shrink:0">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- ── SECTION 6: Add to Verified Donor Pool ────────── -->
+      <div style="margin-top:24px;margin-bottom:4px">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:12px">
+          <i class="fa-solid fa-users-check" style="color:var(--primary);margin-right:6px"></i>Section 6 — Verified Donor Pool <span style="font-weight:500;text-transform:none;letter-spacing:0">(optional)</span>
+        </div>
+
+        <!-- Toggle checkbox -->
+        <div id="addToPoolToggleWrap" style="background:var(--surface-2);border:1.5px solid var(--border-color);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .2s,background .2s" onclick="toggleDonorPoolSection()">
+          <input type="checkbox" id="fAddToPool" style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;flex-shrink:0" onclick="event.stopPropagation();toggleDonorPoolSection()"/>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Add donor to Verified Donor Pool</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Donor will appear in the pool and can be called/notified for future donations</div>
+          </div>
+          <div style="width:32px;height:32px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex-shrink:0">
+            <i class="fa-solid fa-user-plus" style="font-size:14px"></i>
+          </div>
+        </div>
+
+        <!-- Expandable pool details -->
+        <div id="donorPoolSection" style="display:none;margin-top:12px;background:rgba(29,158,117,.06);border:1.5px solid rgba(29,158,117,.2);border-radius:12px;padding:18px 16px">
+
+          <!-- Donor summary banner (auto-filled) -->
+          <div id="poolDonorBanner" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border-color);border-radius:10px;margin-bottom:16px">
+            <div id="poolDonorAvatar" style="width:38px;height:38px;border-radius:50%;background:var(--primary);color:white;font-size:14px;font-weight:800;display:grid;place-items:center;flex-shrink:0">—</div>
+            <div style="flex:1">
+              <div id="poolDonorName" style="font-size:13px;font-weight:800;color:var(--text-primary)">—</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:3px">
+                <span id="poolDonorBG" style="font-size:12px;font-weight:900;color:var(--danger)">—</span>
+                <span style="font-size:11px;color:var(--text-muted)">·</span>
+                <span id="poolDonorPhone" style="font-size:11px;color:var(--text-muted)">—</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Verified On</div>
+              <div id="poolVerifiedDate" style="font-size:12px;font-weight:800;color:var(--primary);margin-top:2px">—</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="form-field">
+              <label>Verified Blood Group</label>
+              <select id="fPoolBloodGroup">
+                <option value="">Auto from report</option>
+                <option>A+</option><option>A−</option>
+                <option>B+</option><option>B−</option>
+                <option>AB+</option><option>AB−</option>
+                <option>O+</option><option>O−</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Verification Date</label>
+              <input type="date" id="fPoolVerifiedDate"/>
+            </div>
+            <div class="form-field">
+              <label>Eligibility Status</label>
+              <select id="fPoolEligible">
+                <option value="true">Eligible to donate</option>
+                <option value="false">Temporarily Ineligible</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Next Eligible Date</label>
+              <input type="date" id="fPoolNextDate"/>
+            </div>
+          </div>
+
+          <!-- Notify toggle -->
+          <div style="background:var(--surface);border:1.5px solid var(--border-color);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <i class="fa-solid fa-bell" style="color:var(--purple);font-size:14px"></i>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Notification Preferences</div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface-2);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('fNotifyDonation').click()">
+              <input type="checkbox" id="fNotifyDonation" checked style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;margin-top:1px;flex-shrink:0"/>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary)">Notify when called for donation</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Blood bank can send an in-app alert when this donor's blood group is needed</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface-2);border-radius:8px;cursor:pointer" onclick="document.getElementById('fNotifyEligibility').click()">
+              <input type="checkbox" id="fNotifyEligibility" checked style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;margin-top:1px;flex-shrink:0"/>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary)">Notify when eligible again</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Automatic reminder sent to donor on their next eligible donation date</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pool notes -->
+          <div class="form-field" style="margin-bottom:0">
+            <label>Pool Notes <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <textarea id="fPoolNotes" placeholder="Any notes about this donor's eligibility, special conditions, etc." style="min-height:56px;resize:vertical;width:100%;background:var(--surface);border:1.5px solid var(--border-color);color:var(--text-primary);border-radius:9px;padding:10px 13px;font-family:inherit;font-size:13px;outline:none"></textarea>
+          </div>
+        </div>
+      </div>
+    </div><!-- end finaliseBody -->
+
+    <div style="padding:16px 28px 24px;border-top:1px solid var(--border-color)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:11px;color:var(--text-muted)">
+          <i class="fa-solid fa-shield-check" style="color:var(--ok);margin-right:4px"></i>
+          Report will be sent directly to donor's Medical Resume
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-ghost" onclick="closeFinaliseModal()">Cancel</button>
+          <button class="btn-primary" id="finaliseSubmitBtn"
+            style="background:var(--purple);box-shadow:0 2px 6px rgba(139,92,246,.18)"
+            onclick="submitFinaliseReport()">
+            <i class="fa-solid fa-paper-plane"></i> Finalise &amp; Send to Donor
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ LOGOUT CONFIRMATION MODAL ══════════════════════ -->
+<div class="modal-overlay" id="logoutConfirmOverlay" onclick="if(event.target===this)closeLogoutModal()" style="z-index:600">
+  <div class="modal" style="width:380px;text-align:center">
+    <div class="modal-body" style="padding:36px 32px 28px">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--danger-dim);display:grid;place-items:center;margin:0 auto 20px">
+        <i class="fa-solid fa-arrow-right-from-bracket" style="font-size:26px;color:var(--danger)"></i>
+      </div>
+      <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:8px">Log out of Lifynk?</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:28px">
+        You'll be returned to the login screen.<br>Your data is saved and synced.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn-primary" onclick="confirmLogout()" style="background:var(--danger);box-shadow:0 4px 16px rgba(225,29,72,.3);justify-content:center;gap:10px;width:100%;padding:13px">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Yes, Log Me Out
+        </button>
+        <button class="btn-ghost" onclick="closeLogoutModal()" style="width:100%;justify-content:center;padding:13px">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- B2: Notification Panel -->
+<div id="notifPanel">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2">
+    <span style="font-size:13px;font-weight:800;color:var(--text-primary)"><i class="fa-solid fa-bell" style="color:var(--primary);margin-right:8px"></i>Notifications</span>
+  </div>
+  <div id="notifList">
+    <div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">
+      <i class="fa-solid fa-bell-slash" style="display:block;margin-bottom:8px;font-size:22px;opacity:.4"></i>No new notifications
+    </div>
+  </div>
+</div>
+
+<script type="module" src="../js/bloodbank.js"></script>
+
+</body>
+</html>

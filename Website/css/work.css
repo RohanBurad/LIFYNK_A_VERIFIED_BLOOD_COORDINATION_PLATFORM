@@ -1,0 +1,322 @@
+/* --- ROOT VARIABLES --- */
+:root {
+    --primary-teal: #0d9488;
+    --primary-dark: #0f172a;
+    --bg-light: #f0fdfa;
+    --white: #ffffff;
+    --text-gray: #475569;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --radius: 30px;
+    --transition: all 0.3s ease;
+}
+
+/* --- RESET & BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: var(--white);
+    color: var(--primary-dark);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1);
+}
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- NAVBAR --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 0 5%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    z-index: 1000;
+    background: rgb(255, 255, 255); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.logo img{
+    height: 50px;
+    width: auto;
+}
+
+.nav-links { 
+    display: flex; 
+    list-style: none; 
+    gap: 40px;
+    align-items: center;
+    margin-right: 60px; 
+}
+
+.nav-links a { 
+    text-decoration: none; 
+    color: #0f172a;
+    font-weight: 700; 
+    font-size: 15px; 
+    position: relative;
+    padding: 10px 0;
+    transition: 0.3s ease; 
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #0d9488; 
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover, .nav-links a.active { color: #0d9488; }
+.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+/* --- LOGIN BUTTON --- */
+.btn-login {
+    background: #0d9488; 
+    color: white !important;
+    padding: 10px 35px; 
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    transition: 0.3s all ease;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2);
+}
+
+.btn-login:hover {
+    background: #0f766e; 
+    transform: translateY(-2px);
+}
+
+
+/* --- PARALLAX HERO SECTION --- */
+.work-hero {
+    position: relative;
+    padding: 100px 0;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+    background-color: var(--primary-dark);
+    background-image: linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)), 
+                      url('https://images.unsplash.com/photo-1614935151651-0bea6508db6b?q=80&w=925&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Creates the Parallax effect */
+}
+
+.work-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -25%;
+    width: 150%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(13, 148, 136, 0.2) 0%, rgba(15, 23, 42, 0) 60%);
+    animation: floatingGlow 12s ease-in-out infinite alternate;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.work-hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-subtitle {
+    color: #5eead4;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+}
+
+.hero-description {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #b2b5bb;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+}
+
+/* --- ARCHITECTURE GRID --- */
+.section-padding { padding: 120px 0; }
+.bg-light { background-color: var(--bg-light); }
+.text-center { text-align: center; }
+
+.architecture-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.diag-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.1s ease, border-color 0.1s ease;
+    border: 1px solid rgba(13, 148, 136, 0.1);
+}
+
+.diag-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-teal);
+}
+
+.diag-icon {
+    font-size: 2.5rem;
+    color: var(--primary-teal);
+    margin-bottom: 20px;
+}
+
+/* --- ZIG-ZAG WORKFLOW --- */
+.zigzag {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    margin-bottom: 100px;
+}
+
+.zigzag.reverse { flex-direction: row-reverse; }
+
+.zigzag-content { flex: 1; }
+
+.zigzag-image { 
+    flex: 1; 
+    overflow: hidden; 
+    border-radius: 20px;
+}
+
+.zigzag-image img {
+    width: 100%;
+    transition: transform 0.5s ease;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.zigzag-image:hover img {
+    transform: scale(1.05);
+}
+
+.step-num {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: rgba(27, 27, 27, 0.1);
+    display: block;
+    margin-bottom: -15px;
+}
+
+/* --- FOOTER --- */
+footer a {
+    transition: color 0.3s ease;
+}
+
+/* --- REVEAL ENGINE --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.delay-1 { transition-delay: 0.2s; }
+.delay-2 { transition-delay: 0.4s; }
+.delay-3 { transition-delay: 0.6s; }
+.delay-4 { transition-delay: 0.8s; }
+.delay-5 { transition-delay: 1.0s; }
+
+/* --- CONTACT PAGE SPECIFIC --- */
+.contact-input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    margin-bottom: 20px;
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+.contact-input:focus {
+    outline: none;
+    border-color: var(--primary-teal);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+/* --- COLLABORATORS SPECIFIC --- */
+/* Custom styling for the Collab icon circles */
+.collab-icon-box {
+    width: 60px;
+    height: 60px;
+    background: var(--bg-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-teal);
+    font-size: 1.2rem;
+}
+
+/* --- RESPONSIVE TWEAKS --- */
+@media (max-width: 768px) {
+    .zigzag {
+        flex-direction: column !important;
+        gap: 40px;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .section-padding {
+        padding: 60px 0;
+    }
+}
+/* --- ANIMATIONS --- */
+@keyframes floatingGlow {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(5%, 10%) scale(1.1); }
+    100% { transform: translate(-5%, -5%) scale(1); }
+}

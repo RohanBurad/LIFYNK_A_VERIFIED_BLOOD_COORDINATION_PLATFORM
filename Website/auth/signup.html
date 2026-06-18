@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Lifynk</title>
+    <link href="../assets/favicon.png" rel="icon">
+    <link rel="stylesheet" href="../css/signup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .role-tabs { gap: 4px; }
+        .tab { font-size: 13px; padding: 11px 8px; }
+
+        /* Country code + phone side by side */
+        .phone-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+        .country-code-select {
+            padding: 12px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13px;
+            background: #f8fafc;
+            outline: none;
+            cursor: pointer;
+            width: 105px;          /* fixed compact width */
+            flex-shrink: 0;        /* never shrink */
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        .country-code-select:focus {
+            border-color: #0d9488;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+        }
+        .phone-number-input {
+            flex: 1;               /* takes all remaining space */
+            min-width: 0;          /* important: allows flex shrink */
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: #f8fafc;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        .phone-number-input:focus {
+            background: white;
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+        }
+
+        /* Override signup.css width:100% that breaks phone row */
+        .input-group .phone-row {
+            display: flex !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        .input-group .phone-row .country-code-select {
+            width: 105px !important;
+            min-width: 105px !important;
+            max-width: 105px !important;
+            flex-shrink: 0 !important;
+        }
+        .input-group .phone-row .phone-number-input {
+            width: auto !important;
+            flex: 1 !important;
+            min-width: 0 !important;
+        }
+
+        /* Recipient urgency */
+        .recipient-urgency {
+            border-color: #fda4af !important;
+            background: #fff1f2 !important;
+            color: #be123c !important;
+            font-weight: 600;
+        }
+        .recipient-urgency:focus {
+            box-shadow: 0 0 0 3px rgba(225,29,72,0.1) !important;
+            border-color: #e11d48 !important;
+        }
+        .label-urgent { color: #e11d48 !important; }
+    </style>
+</head>
+<body>
+
+<div class="signup-container">
+
+    <div class="signup-image">
+        <div class="image-overlay">
+            <div class="quote-box">
+                <h2>"Be the Reason <br>Someone Smiles Today."</h2>
+                <p>Join the largest network of heroes.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="signup-form-section">
+        <div class="form-wrapper">
+
+            <div class="form-header">
+                <img src="../assets/logo.png" alt="Lifynk Logo" class="brand-logo">
+                <a href="../pages/home.html" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Home
+                </a>
+                <h2 class="brand-title">Create Account</h2>
+                <p>Sign up to get started</p>
+            </div>
+
+            <!-- TABS -->
+            <div class="role-tabs">
+                <button class="tab active" onclick="openForm(event,'donor')">
+                    <i class="fa-solid fa-droplet"></i> Donor
+                </button>
+                <button class="tab" onclick="openForm(event,'recipient')">
+                    <i class="fa-solid fa-user-injured"></i> Recipient
+                </button>
+                <button class="tab" onclick="openForm(event,'hospital')">
+                    <i class="fa-solid fa-hospital"></i> Hospital
+                </button>
+                <button class="tab" onclick="openForm(event,'ngo')">
+                    <i class="fa-solid fa-hand-holding-heart"></i> NGO
+                </button>
+                <button class="tab" onclick="openForm(event,'bloodbank')">
+                    <i class="fa-solid fa-flask-vial"></i> Blood Bank
+                </button>   
+            </div>
+
+            <!-- ══ FORM 1 — DONOR ══ -->
+            <form id="form-donor" class="signup-form" data-role="donor">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="donor-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Blood Group</label>
+                        <select id="donor-blood" required>
+                            <option value="">Select</option>
+                            <option>A+</option><option>A-</option>
+                            <option>B+</option><option>B-</option>
+                            <option>O+</option><option>O-</option>
+                            <option>AB+</option><option>AB-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Age</label>
+                        <input type="number" id="donor-age" placeholder="18+" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Gender</label>
+                        <select id="donor-gender" required>
+                            <option value="">Select</option>
+                            <option>Male</option><option>Female</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Official Email</label>
+                    <input type="email" id="donor-email" placeholder="xyz@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <div class="phone-row">
+                        <select class="country-code-select" id="country-code">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+27">🇿🇦 +27</option>
+                        </select>
+                        <input type="tel" id="donor-phone" class="phone-number-input"
+                               placeholder="9876543210" pattern="[0-9]{7,12}" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Address / City</label>
+                    <input type="text" id="donor-city" placeholder="e.g. Ahmedabad, Gujarat" required>
+                </div>
+                <div class="verification-box">
+                    <label class="section-label">
+                        <i class="fa-solid fa-id-card"></i> Identity Verification
+                    </label>
+                    <div class="input-group">
+                        <select id="donor-id-type">
+                            <option>Aadhar Card</option>
+                            <option>PAN Card</option>
+                            <option>Driving License</option>
+                        </select>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Click to upload ID Proof</p>
+                        <input type="file" id="donor-id-file" accept="image/*,.pdf" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="donor-password" placeholder="Create Password" required>
+                </div>
+                <div class="terms">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms & Conditions</a></span>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-droplet"></i> Register as Donor
+                </button>
+            </form>
+
+            <!-- ══ FORM 2 — RECIPIENT ══ -->
+            <form id="form-recipient" class="signup-form" data-role="recipient" style="display: none;">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="recipient-name" placeholder="Akshay khana" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Blood Group</label>
+                        <select id="recipient-blood" required>
+                            <option value="">Select</option>
+                            <option>A+</option><option>A-</option>
+                            <option>B+</option><option>B-</option>
+                            <option>O+</option><option>O-</option>
+                            <option>AB+</option><option>AB-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Age</label>
+                        <input type="number" id="recipient-age" placeholder="Any age" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Gender</label>
+                        <select id="recipient-gender" required>
+                            <option value="">Select</option>
+                            <option>Male</option><option>Female</option><option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Official Email</label>
+                    <input type="email" id="recipient-email" placeholder="recipient@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <div class="phone-row">
+                        <select class="country-code-select" id="recipient-code">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option> 
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+27">🇿🇦 +27</option>
+                        </select>
+                        <input type="tel" id="recipient-phone" class="phone-number-input"
+                               placeholder="9876543210" pattern="[0-9]{7,12}" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Address / City</label>
+                    <input type="text" id="recipient-city" placeholder="e.g. Ahmedabad, Gujarat" required>
+                </div>
+                <div class="verification-box">
+                    <label class="section-label">
+                        <i class="fa-solid fa-id-card"></i> Identity Verification
+                    </label>
+                    <div class="input-group">
+                        <select id="recipient-id-type">
+                            <option>Aadhar Card</option>
+                            <option>PAN Card</option>
+                            <option>Driving License</option>
+                        </select>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Click to upload ID Proof</p>
+                        <input type="file" id="recipient-id-file" accept="image/*,.pdf" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="recipient-password" placeholder="Create Password" required>
+                </div>
+                <div class="terms">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms & Conditions</a></span>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-droplet"></i> Register as Recipient
+                </button>
+            </form>
+
+            <!-- ══ FORM 3 — HOSPITAL ══ -->
+            <form id="form-hospital" class="signup-form" data-role="hospital" style="display:none;">
+                <div class="input-group">
+                    <label>Hospital Name</label>
+                    <input type="text" id="hospital-name" placeholder="City General Hospital" required>
+                </div>
+                <div class="input-group">
+                    <label>Official Email</label>
+                    <input type="email" id="hospital-email" placeholder="admin@hospital.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Hospital Phone</label>
+                    <div class="phone-row">
+                        <select class="country-code-select" id="hospital-code">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+27">🇿🇦 +27</option>
+                        </select>
+                        <input type="tel" id="hospital-phone" class="phone-number-input"
+                               placeholder="9876543210" pattern="[0-9]{7,12}" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Address / City</label>
+                    <input type="text" id="hospital-city" placeholder="e.g. Ahmedabad, Gujarat" required>
+                </div>
+                <div class="verification-box">
+                    <label class="section-label">
+                        <i class="fa-solid fa-building-circle-check"></i> Hospital Verification
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="hospital-license"
+                               placeholder="Clinical Est. License No." required>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-file-medical"></i>
+                        <p>Upload State Health License</p>
+                        <input type="file" id="hospital-doc" accept=".pdf,image/*" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="hospital-password" placeholder="Create Admin Password" required>
+                </div>
+                <div class="terms">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms & Conditions</a></span>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-hospital"></i> Register Hospital
+                </button>
+            </form>
+
+            <!-- ══ FORM 4 — NGO ══ -->
+            <form id="form-ngo" class="signup-form" data-role="ngo" style="display:none;">
+                <div class="input-group">
+                    <label>NGO / Organization Name</label>
+                    <input type="text" id="ngo-name" placeholder="Helping Hands Foundation" required>
+                </div>
+                <div class="input-group">
+                    <label>President / Owner Name</label>
+                    <input type="text" id="ngo-owner" placeholder="Full Name" required>
+                </div>
+                <div class="input-group">
+                    <label>Official Email</label>
+                    <input type="email" id="ngo-email" placeholder="admin@ngo.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Contact Number</label>
+                    <div class="phone-row">
+                        <select class="country-code-select" id="ngo-code">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+27">🇿🇦 +27</option>
+                        </select>
+                        <input type="tel" id="ngo-phone" class="phone-number-input"
+                               placeholder="9876543210" pattern="[0-9]{7,12}" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>City / Operating Area</label>
+                    <input type="text" id="ngo-city" placeholder="e.g. Ahmedabad, Gujarat" required>
+                </div>
+                <div class="verification-box">
+                    <label class="section-label">
+                        <i class="fa-solid fa-certificate"></i> NGO Verification
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="ngo-reg-id"
+                               placeholder="NGO Darpan / Registration ID" required>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-file-contract"></i>
+                        <p>Upload Registration Certificate</p>
+                        <input type="file" id="ngo-doc" accept=".pdf,image/*" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="ngo-password" placeholder="Create Password" required>
+                </div>
+                <div class="terms">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms & Conditions</a></span>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-hand-holding-heart"></i> Register NGO
+                </button>
+            </form>
+
+            <!-- Form 5 Blood Bank -->
+            <form id="form-bloodbank" class="signup-form" data-role="bloodbank" style="display:none;">
+                <div class="input-group">
+                    <label>Blood Bank Name</label>
+                    <input type="text" id="bb-name" placeholder="e.g. City Blood Bank" required>
+                </div>
+                <div class="input-group">
+                    <label>Director / In-charge Name</label>
+                    <input type="text" id="bb-director" placeholder="Full Name" required>
+                </div>
+                <div class="input-group">
+                    <label>Official Email</label>
+                    <input type="email" id="bb-email" placeholder="admin@bloodbank.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Contact Number</label>
+                    <div class="phone-row">
+                        <select class="country-code-select" id="bb-code">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                        </select>
+                        <input type="tel" id="bb-phone" class="phone-number-input"
+                               placeholder="9876543210" pattern="[0-9]{7,12}" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>City / Location</label>
+                    <input type="text" id="bb-city" placeholder="e.g. Ahmedabad, Gujarat" required>
+                </div>
+                <div class="verification-box">
+                    <label class="section-label">
+                        <i class="fa-solid fa-certificate"></i> Blood Bank Verification
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="bb-license"
+                               placeholder="CDSCO / State Blood Bank License No." required>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-file-medical"></i>
+                        <p>Upload License Certificate</p>
+                        <input type="file" id="bb-doc" accept=".pdf,image/*" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="bb-password" placeholder="Create Password" required>
+                </div>
+                <div class="terms">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms & Conditions</a></span>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-flask-vial"></i> Register Blood Bank
+                </button>
+            </form>
+
+            <p class="login-link">
+                Already have an account? <a href="login.html">Login here</a>
+            </p>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+// ── Tab Switcher ──────────────────────────────────────────────
+function openForm(event, role) {
+    ['donor','recipient','hospital','ngo','bloodbank'].forEach(r => {
+        const el = document.getElementById('form-' + r);
+        if (el) el.style.display = 'none';
+    });
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('form-' + role).style.display = 'block';
+    event.currentTarget.classList.add('active');
+}
+</script>
+<script type="module" src="../js/signup.js"></script>
+</body>
+</html>

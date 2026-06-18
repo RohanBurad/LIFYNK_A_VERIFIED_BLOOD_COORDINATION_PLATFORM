@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Yourself | Lifynk</title>
+
+  <link href="../assets/favicon.png" rel="icon">
+  <link rel="stylesheet" href="../css/verify.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-8px); }
+      40%       { transform: translateX(8px); }
+      60%       { transform: translateX(-5px); }
+      80%       { transform: translateX(5px); }
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div class="verify-container">
+
+  <!-- Left decorative panel -->
+  <div class="verify-image">
+    <div class="image-overlay">
+      <div class="quote-box">
+        <h2>Verify Yourself<br>And<br>Join the largest network of heroes.</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right OTP panel -->
+  <div class="verify-otp-section">
+    <div class="form-wrapper">
+
+      <div class="form-header">
+        <img src="../assets/logo.png" alt="Lifynk Logo" class="brand-logo">
+
+        <a href="../pages/home.html" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
+
+        <h2 class="brand-title">Verify Yourself</h2>
+
+        <p id="otp-message">
+          Enter the 6-digit code sent to <span id="display-phone"></span>
+        </p>
+
+        <p>
+          Resend Available in: <span id="timer">01:00</span>
+        </p>
+      </div>
+
+      <!-- OTP digit inputs -->
+      <div class="otp-inputs" style="display:flex;gap:12px;justify-content:center;margin-bottom:25px;">
+        <input type="tel" inputmode="numeric" class="otp-digit" maxlength="1" autocomplete="one-time-code" aria-label="OTP digit 1" style="width:50px;height:55px;text-align:center;font-size:20px;border:2px solid #e2e8f0;border-radius:12px;font-weight:700;outline:none;">
+        <input type="tel" inputmode="numeric" class="otp-digit" maxlength="1" aria-label="OTP digit 2" style="width:50px;height:55px;text-align:center;font-size:20px;border:2px solid #e2e8f0;border-radius:12px;font-weight:700;outline:none;">
+        <input type="tel" inputmode="numeric" class="otp-digit" maxlength="1" aria-label="OTP digit 3" style="width:50px;height:55px;text-align:center;font-size:20px;border:2px solid #e2e8f0;border-radius:12px;font-weight:700;outline:none;">
+        <input type="tel" inputmode="numeric" class="otp-digit" maxlength="1" aria-label="OTP digit 4" style="width:50px;height:55px;text-align:center;font-size:20px;border:2px solid #e2e8f0;border-radius:12px;font-weight:700;outline:none;">
+        <input type="tel" inputmode="numeric" class="otp-digit" maxlength="1" aria-label="OTP digit 5" style="width:50px;height:55px;text-align:center;font-size:20px;border:2px solid #e2e8f0;border-radius:12px;font-weight:700;outline:none;">
+        <input type="tel" inputmode="numeric" class="otp-digit" maxlength="1" aria-label="OTP digit 6" style="width:50px;height:55px;text-align:center;font-size:20px;border:2px solid #e2e8f0;border-radius:12px;font-weight:700;outline:none;">
+      </div>
+
+      <!-- reCAPTCHA mounts here (invisible) -->
+      <div id="recaptcha-container"></div>
+
+      <!-- Verify button -->
+      <button type="button" class="btn-submit" id="verifyBtn" onclick="verifyOTP()">
+        Verify
+      </button>
+
+      <!-- Resend row — disabled by default, verify.js enables it after timer -->
+      <p style="text-align:center;margin-top:15px;font-size:14px;color:#64748b;">
+        Didn't receive code?
+        <button
+          id="resendBtn"
+          onclick="handleResend()"
+          disabled
+          style="color:#0d9488;font-weight:700;border:none;background:none;cursor:pointer;opacity:0.5;">
+          Resend
+        </button>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- All OTP + Firebase logic is in js/verify.js -->
+<script type="module" src="../js/verify.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifynk | Coordination System</title>
+    <link rel="icon" href="../assets/favicon.png"> 
+    <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+    </script>
+</head>
+<body>
+    <header class="main-hero">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="../assets/logo.png" alt="Lifynk">
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="home.html" class="active">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="work.html">Our Working</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="colab.html">Our Collaborators</a></li>
+            </ul>
+            
+            <a href="../auth/login.html" class="btn-login">Login</a>
+        </nav>
+
+        <div class="hero-content">
+            <h1 class="reveal">Bridging the Gap Between <br> <span class="highlight-text">Life and Hope</span></h1>
+            <p class="reveal delay-1">A centralized ecosystem connecting verified donors , NGOs, Hospitals , Blood Banks and Recipients.<br>We are here with digital solution platform "Lifynk" improving the manual coordination in blood donation process by providing a seamless interface for all stakeholders. </p>
+            <div class="cta-buttons reveal delay-2">
+                <button class="btn-request" onclick="window.location.href='emer.html'">Request Emergency Blood</button>
+                <button class="btn-register-hero" onclick="window.location.href='../auth/signup.html'">Register as a Life-Saver</button>
+            </div>
+        </div>
+        <!-- Feature Cards -->
+        <div class="feature-cards">
+            <div class="card reveal delay-1">
+                <div class="icon-box icon-teal">
+                    <i class="fa-solid fa-droplet"></i>
+                </div>
+                <div class="card-text">
+                    <h3>Donor Registration</h3>
+                    <p>Securely sign up and provide documentation for NGO verification, building a trusted verified donor pool.</p>
+                </div>
+            </div>
+            <div class="card reveal delay-2">
+                <div class="icon-box icon-navy">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <div class="card-text">
+                    <h3>NGO Approved</h3>
+                    <p>Validation of every donor request and camp coordination to eliminate fake information across the network.</p>
+                </div>
+            </div>
+            <div class="card reveal delay-3">
+                <div class="icon-box icon-grey">
+                    <i class="fa-solid fa-hospital"></i>
+                </div>
+                <div class="card-text">
+                    <h3>Hospital Verification</h3>
+                    <p>Access real-time blood stock across nearby blood banks and trigger emergency broadcasts when supply is critically low.</p>
+                </div>
+            </div>
+            <div class="card reveal delay-4">
+                <div class="icon-box icon-blue">
+                    <i class="fa-solid fa-vials"></i>
+                </div>
+                <div class="card-text">
+                    <h3>Blood Bank</h3>
+                    <p>Conduct full medical screening, store donor reports as a digital Medical Resume, and manage real-time blood stock inventory.</p>
+                </div>
+            </div>
+            <div class="card reveal delay-5">
+                <div class="icon-box icon-red">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div class="card-text">
+                    <h3>Recipient</h3>
+                    <p>Instantly locate compatible verified blood units nearby and receive emergency donor notifications during the Golden Hour.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section class="impact-section">
+        <div class="impact-container">
+            <div class="impact-image reveal">
+                <img src="https://plus.unsplash.com/premium_photo-1698755473432-4a8e954685e0?q=80&w=857&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Saving Lives">
+            </div>
+
+            <div class="impact-text">
+                <h2 class="reveal">Every Drop Counts: <br><span class="highlight-text">Our Digital Mission</span></h2>
+                <p class="reveal delay-1">Lifynk is not just a platform; it's a lifeline. By digitizing the blood donation process, we eliminate manual work and ensure that every emergency request reaches the right donor in seconds.</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-item reveal delay-1">
+                        <div class="icon-box icon-yellow">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div>
+                            <h3>Real-time</h3>
+                            <p>Matching Logic</p>
+                        </div>
+                    </div>
+                    <div class="stat-item reveal delay-2">
+                        <div class="icon-box icon-teal">    
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <h3>Location</h3>
+                            <p>Based Alerts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="footer reveal">
+        <p>Terms & Conditions Apply</p>
+        <div style="text-align: center; padding-top: 10px; letter-spacing: 1px;">
+                &copy; 2026 Lifynk | Blood Donation Coordination System | All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                
+                // Agar element footer hai toh jaldi trigger karein, warna 80px gap rakhein
+                var isFooter = reveals[i].classList.contains('footer');
+                var elementVisible = isFooter ? 10 : 80; 
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                } 
+                // Note: Humne 'else' mein class remove karne wala logic hata diya hai 
+                // taaki animation sirf ek baar ho aur fluctuate na kare.
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
+        window.addEventListener("load", reveal);
+        reveal();
+    </script>
+</body>
+</html>

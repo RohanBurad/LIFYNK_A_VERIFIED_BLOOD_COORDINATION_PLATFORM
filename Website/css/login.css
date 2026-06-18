@@ -1,0 +1,319 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: #f0fdfa; /* Light Teal Background */
+    min-height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: stretch;
+    background: white;
+}
+
+/* --- LEFT SIDE (IMAGE) --- */
+.login-image {
+    width: 50%;
+    background: url('https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=2000') no-repeat center center/cover;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+    align-self: flex-start;
+    display: flex;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Teal to Dark Blue Gradient Overlay */
+    background: linear-gradient(to bottom, rgba(13, 148, 136, 0.4), rgba(15, 23, 42, 0.85));
+    display: flex;
+    align-items: flex-end;
+    padding: 60px;
+}
+
+.quote-box {
+    color: white;
+    max-width: 450px;
+}
+
+.quote-box h2 {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 15px;
+    line-height: 1.1;
+}
+
+.quote-box p {
+    font-size: 18px;
+    font-weight: 400;
+    opacity: 0.95;
+}
+
+/* --- RIGHT SIDE (FORM) --- */
+.login-form-section {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    min-height: 100vh;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* --- HEADER & LOGO (FIXED SECTION) --- */
+.form-header {
+    margin-bottom: 35px;
+    text-align: center; /* 1. This centers the "Welcome Back" text */
+}
+
+.back-link {
+    text-decoration: none;
+    color: #64748b;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    transition: color 0.3s;
+    /* Optional: If you want the 'Back' link to stay on the left, un-comment the line below */
+    /* float: left; width: 100%; */
+}
+
+.back-link:hover { color: #0d9488; }
+
+.brand-logo {
+    width: auto;          /* Adjusted width for better centering */
+    height: 50px;
+    margin-bottom: 15px;
+    /* 2. This centers the Logo Image */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.brand-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.form-header p {
+    color: #64748b;
+    font-size: 16px;
+}
+
+/* --- TABS --- */
+.role-tabs {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    gap: 5px;
+}
+
+.tab {
+    flex: 2;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    color: #0d9488;
+}
+
+.tab.active {
+    background: white;
+    color: #0d9488; /* Active Teal Text */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+}
+
+/* --- INPUTS --- */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.input-field {
+    position: relative;
+    width: 100%;
+}
+
+.input-field i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 14px 16px 14px 48px; /* Padding left for icon space */
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: #f8fafc;
+}
+
+.input-field input:focus {
+    background: white;
+    border-color: #0d9488;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+.input-field input:focus + i {
+    color: #0d9488;
+}
+
+.toggle-password {
+    left: auto !important; /* Override left positioning */
+    right: 16px;
+    cursor: pointer;
+}
+
+.toggle-password:hover {
+    color: #0d9488;
+}
+
+/* --- BUTTONS & ACTIONS --- */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.forgot-pass {
+    text-decoration: none;
+    color: #0d9488;
+    font-weight: 600;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: #0d9488;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.4);
+}
+
+.btn-submit:hover {
+    background: #0f766e;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(13, 148, 136, 0.4);
+}
+
+.register-link {
+    text-align: center;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.register-link a {
+    color: #0d9488;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 900px) {
+    .login-image {
+        display: none; /* Hide image on mobile/tablet */
+    }
+    .login-form-section {
+        width: 100%;
+        padding: 20px;
+    }
+    .form-wrapper {
+        max-width: 100%;
+    }
+}
+/* --- LOGIN ANIMATIONS --- */
+.login-form { animation: fadeInUp 0.5s ease forwards; }
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.shake-error {
+    animation: shake 0.4s ease-in-out;
+    border-color: #e11d48 !important;
+    background-color: #fff1f2 !important;
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+}
+
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+.btn-loading::after {
+    content: ""; position: absolute; width: 22px; height: 22px;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
